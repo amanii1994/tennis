@@ -1,18 +1,60 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { NavigationActions } from 'react-navigation';
-import { ScrollView, TouchableOpacity, AsyncStorage,Text, StyleSheet, View, Image, Platform } from 'react-native';
+import { ScrollView, TouchableOpacity, AsyncStorage, Text, StyleSheet, View, Image, Platform } from 'react-native';
 import { StackNavigator } from 'react-navigation';
+import restapi from './class/restapi';
+import config from './config';
+import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 const fontReg = (Platform.OS === 'ios') ? 'Montserrat-Regular' : 'Montserrat-Regular';
 const fontMed = (Platform.OS === 'ios') ? 'Montserrat-Medium' : 'Montserrat-Medium';
 const fontSemiBold = (Platform.OS === 'ios') ? 'Montserrat-SemiBold' : 'Montserrat-SemiBold';
 const fontBold = (Platform.OS === 'ios') ? 'Montserrat-Bold' : 'Montserrat-Bold';
 class SideMenu extends Component {
-  constructor(props){
+  constructor(props) {
     super(props);
   }
-  _logout(){
+  _signOut = async () => {
+    try {
+      await GoogleSignin.revokeAccess();
+      await GoogleSignin.signOut();
+      this.setState({ userInfo: null, error: null });
+    } catch (error) {
+      this.setState({
+        error,
+      });
+    }
+  };
+  async _getCurrentUser() {
+    try {
+      const userInfo = await GoogleSignin.signInSilently();
+      this.setState({ userInfo, error: null });
+    } catch (error) {
+      const errorMessage =
+        error.code === statusCodes.SIGN_IN_REQUIRED ? 'Please sign in :)' : error.message;
+      this.setState({
+        error: new Error(errorMessage),
+      });
+    }
+  }
+  async componentDidMount() {
+    this._configureGoogleSignIn();
+    await this._getCurrentUser();
+  }
+  _configureGoogleSignIn() {
+    GoogleSignin.configure({
+      webClientId: (Platform.OS === 'ios') ? config.webClientIdIos : config.webClientId,
+      offlineAccess: false,
+    });
+  }
+  _logout() {
+    let usrdata = restapi.getCurrentUser('authData');
+    usrdata.then((userData) => {
+      if (userData.type == 'google') {
+        this._signOut();
+      }
+    })
     AsyncStorage.clear();
     this.props.navigation.navigate('Auth');
   }
@@ -25,14 +67,14 @@ class SideMenu extends Component {
   render() {
     const { navigate } = this.props.navigation;
     return (
-      <View style={{ flexDirection: 'row', flex: 1 ,}}>
-        <View style={[styles.container, { flex:2 }]}>
+      <View style={{ flexDirection: 'row', flex: 1, }}>
+        <View style={[styles.container, { flex: 2 }]}>
           <Text style={styles.headerText}>MENU</Text>
           <View style={{ flexDirection: 'column', margin: wp('5%') }}>
             <TouchableOpacity style={styles.containerA} onPress={() => navigate('tinyClass')}  >
-                
+
               <View style={[styles.imgContainer, { width: wp(4.5), height: wp('6.3') }]}>
-              <Image source={require('./img/tinyClass.png')} style={styles.imgStyle} resizeMode="cover" />
+                <Image source={require('./img/tinyClass.png')} style={styles.imgStyle} resizeMode="cover" />
               </View>
               <Text style={styles.textStyle}>MY TINY CLASSES</Text>
             </TouchableOpacity>
@@ -54,14 +96,14 @@ class SideMenu extends Component {
               </View>
               <Text style={styles.textStyle}>LIVE STREAM</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.containerA} onPress={() => navigate('playlist')}>
+            <TouchableOpacity style={styles.containerA} onPress={() => navigate('Music')}>
               <View style={styles.imgContainer}>
                 <Image source={require('./img/tinytennis.png')} style={styles.imgStyle} resizeMode="cover" />
               </View>
-              <Text style={styles.textStyle}>TINY TENNIS PLAYLIST</Text>
+              <Text style={styles.textStyle}>TINY MUSIC</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.containerA} onPress={() => navigate('giftcard')}  >
-              <View style={[styles.imgContainer,{height:wp('4%')}]}>
+              <View style={[styles.imgContainer, { height: wp('4%') }]}>
                 <Image source={require('./img/gift-card2.png')} style={styles.imgStyle} resizeMode="cover" />
               </View>
               <Text style={styles.textStyle}>GIFT CARD</Text>
@@ -86,7 +128,7 @@ class SideMenu extends Component {
             </TouchableOpacity>
           </View>
           <View style={{ flex: 1, justifyContent: 'flex-end', marginBottom: wp('8%') }}>
-            <TouchableOpacity style={[styles.containerA, { marginLeft: wp('8%') }]} onPress={()=>this._logout()}>
+            <TouchableOpacity style={[styles.containerA, { marginLeft: wp('8%') }]} onPress={() => this._logout()}>
               <View style={[styles.imgContainer, { width: wp('4.5%'), height: wp('3.5') }]}>
                 <Image source={require('./img/logout.png')} style={styles.imgStyle} resizeMode="cover" />
               </View>
@@ -94,7 +136,7 @@ class SideMenu extends Component {
             </TouchableOpacity>
           </View>
         </View>
-        <View style={{  flex: 1 }}>
+        <View style={{ flex: 1 }}>
           <TouchableOpacity style={{ flex: 1 }} onPress={() => this.props.navigation.closeDrawer()}>
           </TouchableOpacity>
         </View>

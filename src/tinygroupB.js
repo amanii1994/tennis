@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Platform, Image, TouchableOpacity, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, StyleSheet, Platform, Image, TouchableOpacity, Alert,Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import StatusBar from './statusBar';
 import { createIconSetFromIcoMoon } from 'react-native-vector-icons';
 import icoMoonConfig from '../selection.json';
+import Rest from './class/restapi';
 import { Button } from 'react-native-elements';
 const Linericon = createIconSetFromIcoMoon(icoMoonConfig, 'icomoon', 'icomoon.ttf');
 const fontReg = (Platform.OS === 'ios') ? 'Montserrat-Regular' : 'Montserrat-Regular';
@@ -11,6 +12,32 @@ const fontMed = (Platform.OS === 'ios') ? 'Montserrat-Medium' : 'Montserrat-Medi
 const fontSemiBold = (Platform.OS === 'ios') ? 'Montserrat-SemiBold' : 'Montserrat-SemiBold';
 const fontBold = (Platform.OS === 'ios') ? 'Montserrat-Bold' : 'Montserrat-Bold';
 export default class tinygroupB extends Component {
+    _isMounted = false;
+    constructor(props) {
+        super(props);
+        this.state = {
+            saveData : {}
+        };
+    }
+    componentDidMount() {
+        this._isMounted = true;
+        if (this._isMounted) {
+            let activity_data = this.props.navigation.getParam('itemData');
+            this.setState({saveData:activity_data});
+        }
+    }
+    componentWillUnmount() {
+        this._isMounted = false;
+    }
+
+    goNext(){
+        let p = Rest.saveAppoint(this.state.saveData);  
+        p.then((data)=>{
+           Alert.alert(data.msg);
+           this.props.navigation.navigate('home');
+        }).then(this.setState({loading: false}));
+    }
+
     render() {
         const { navigate } = this.props.navigation;
         return (
@@ -28,7 +55,7 @@ export default class tinygroupB extends Component {
                                 <Text style={[styles.textcontainerC, { marginLeft: wp('2%') }]}> Where  </Text>
                             </View>
                             <View style={{ width: wp('80%'), justifyContent: 'space-around' }}>
-                                <Text style={[styles.textcontainerC, { alignItems: 'flex-start' }]}> Topauga</Text>
+                                <Text style={[styles.textcontainerC, { alignItems: 'flex-start' }]}> {this.state.saveData.loc_name}</Text>
                             </View>
                         </View>
                     </View>
@@ -38,7 +65,7 @@ export default class tinygroupB extends Component {
                                 <Text style={[styles.textcontainerC, { marginLeft: wp('2%') }]}> Time  </Text>
                             </View>
                             <View style={{ width: wp('80%'), justifyContent: 'space-around' }}>
-                                <Text style={[styles.textcontainerC, { alignItems: 'flex-start' }]}> 9:00AM</Text>
+                                <Text style={[styles.textcontainerC, { alignItems: 'flex-start' }]}>  {this.state.saveData.session_name}</Text>
                             </View>
                         </View>
                     </View>
@@ -48,7 +75,7 @@ export default class tinygroupB extends Component {
                                 <Text style={[styles.textcontainerC, { marginLeft: wp('2%') }]}> Date  </Text>
                             </View>
                             <View style={{ width: wp('80%'), justifyContent: 'space-around' }}>
-                                <Text style={[styles.textcontainerC, { alignItems: 'flex-start' }]}> Sunday , Febaury 2019</Text>
+                                <Text style={[styles.textcontainerC, { alignItems: 'flex-start' }]}>  {this.state.saveData.app_date}</Text>
                             </View>
                         </View>
                     </View>
@@ -58,7 +85,7 @@ export default class tinygroupB extends Component {
                             title='CHECKOUT'
                             color='#fff'
                             titleStyle={styles.buttonText}
-                            onPress={()=> navigate('test1')}
+                            onPress={()=> this.goNext()}
                         />
                     </View>
                 </View>

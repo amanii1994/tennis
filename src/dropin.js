@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, TouchableWithoutFeedback, Platform, Image, Keyboard } from 'react-native';
+import { View, StyleSheet, Text, TouchableWithoutFeedback, TouchableOpacity, Platform, Image, Keyboard, AsyncStorage,Alert } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import StatusBar from './statusBar';
 import { Button } from 'react-native-elements';
@@ -10,10 +10,64 @@ const fontReg = (Platform.OS === 'ios') ? 'Montserrat-Regular' : 'Montserrat-Reg
 const fontMed = (Platform.OS === 'ios') ? 'Montserrat-Medium' : 'Montserrat-Medium';
 const fontSemiBold = (Platform.OS === 'ios') ? 'Montserrat-SemiBold' : 'Montserrat-SemiBold';
 const fontBold = (Platform.OS === 'ios') ? 'Montserrat-Bold' : 'Montserrat-Bold';
+import Constants from './constants';
+const imgUrl = Constants.IMAGE_URL;
 export default class dropin extends Component {
+    _isMounted = false;
     constructor(props) {
-        super(props)
+        super(props);
+        this.state = {
+            activity: {},
+            products: [],
+            product_id:0,
+            activity_id:'',
+            price: '',
+            quantity:1
+        };
     }
+    setActive(key,price) {
+        this.setState({
+            product_id: key,
+            price: price
+        });
+    }
+    goNext(){
+        if(this.state.quantity && this.state.price){
+            this.props.navigation.navigate('dropinA', {
+                activity_id: this.state.activity_id,
+                product_id: this.state.product_id,
+                price: this.state.price,
+                quantity: this.state.quantity
+            })
+        }else{
+            Alert.alert('Please select Price and duration!');
+        }
+    }
+    incrementItem = () => {
+        this.setState({ quantity: this.state.quantity + 1 });
+    }
+    decreaseItem = () => {
+        if (this.state.quantity > 1) {
+            this.setState({ quantity: this.state.quantity - 1 });
+        }
+    }
+
+    componentDidMount() {
+        this._isMounted = true;
+        if (this._isMounted) {
+            AsyncStorage.getItem("appData").then((info) => {
+                if (info) {
+                    let dt = JSON.parse(info);
+                    let itemId = this.props.navigation.getParam('itemId');
+                    this.setState({ activity: dt.activities[itemId], activity_id:dt.activities[itemId].id,products: dt.activities[itemId].products  });
+                }
+            });
+        }
+    }
+    componentWillUnmount() {
+        this._isMounted = false;
+    }
+
     render() {
         const { navigate } = this.props.navigation;
         return (
@@ -24,63 +78,54 @@ export default class dropin extends Component {
                         {/* <Image source={require('./img/dropin.png')} />
                      */}
                         <View style={{ width: wp('100%'), height: hp('23 %'), backgroundcolor: '' }}>
-                            <Image source={require('./img/dropin1.png')} style={{ flex: 1, height: undefined, width: undefined, }} resizeMode="cover" />
+                            <Image source={{ uri: imgUrl + this.state.activity.image }} style={{ flex: 1, height: undefined, width: undefined, }} resizeMode="cover" />
                         </View>
-                        <Linericon name="Group-102" size={wp('6%')} color='#000000' style={{ position: 'absolute', top: 0, left: 0, margin: wp('3%') }} onPress={() => navigate('home')} />
+                        <Linericon name="left-arrow-1" size={wp('6%')} color='#000000' style={{ position: 'absolute', top: 0, left: 0, margin: wp('3%') }} onPress={() => navigate('home')} />
                     </View>
                     <View style={{ flexDirection: 'row', margin: wp('4%') }}>
-                        <Text style={styles.headerText}>Tiny Drop In</Text>
+                        <Text style={styles.headerText}>{this.state.activity.activity_name}</Text>
                         <View style={styles.containerB}>
-                            <Text style={[styles.headerText, { fontFamily: fontSemiBold, color: '#fff', alignSelf: 'center',padding:wp('1%') }]}>Ages 4-8</Text>
+                            <Text style={[styles.headerText, { fontFamily: fontSemiBold, color: '#fff', alignSelf: 'center', padding: wp('1%') }]}>Ages 4-8</Text>
                         </View>
                     </View>
                     <View style={[{ marginLeft: wp('4%'), marginRight: wp('3%') }]}>
-                        <Text style={styles.textP}>Fun and fitness based tennis clinic. The goal is to peak your little ones interest for the game by giving you the flexibility to choose the amount of time your child plays. TT will provide all equipment, teaching aids and instruction.</Text>
+                        <Text style={styles.textP}>{this.state.activity.description}</Text>
                     </View>
                     <View style={{ margin: wp('4%') }}>
                         <Text style={styles.headerText}>Let's Play</Text>
                     </View>
-                    <View style={{ flexDirection: 'row' }}>
-                        <View style={styles.containerC}>
-                            <Text style={[styles.textP, { alignSelf: 'center', fontSize: wp('3.5%') }]}>15 min</Text>
-                            <Text style={styles.textP1}>$ 8</Text>
-                        </View>
-                        <View style={styles.containerC}>
-                            <Text style={[styles.textP, { alignSelf: 'center', fontSize: wp('3.5%') }]}>30 min</Text>
-                            <Text style={styles.textP1}>$ 15</Text>
-                        </View>
-                    </View>
-                    <View style={{ flexDirection: 'row' }}>
-                        <View style={styles.containerC}>
-                            <Text style={[styles.textP, { alignSelf: 'center', fontSize: wp('3.5%') }]}>45 min</Text>
-                            <Text style={styles.textP1}>$ 21</Text>
-                        </View>
-                        <View style={styles.containerC}>
-                            <Text style={[styles.textP, { alignSelf: 'center', fontSize: wp('3.5%') }]}>1 Hour</Text>
-                            <Text style={styles.textP1}>$ 25</Text>
-                        </View>
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                        {this.state.products ? this.state.products.map((data) => {
+                            return (
+                                <TouchableOpacity style={[styles.containerC, { backgroundColor: this.state.product_id == data.id ? '#1AB31A' : 'transparent', borderColor: this.state.product_id == data.id ? '#1AB31A' : '#000' }]} key={data.id} onPress={() => this.setActive(data.id,data.price)}>
+                                    <Text style={[styles.textP, { color: this.state.product_id == data.id ? '#fff' : '#000' }]}>{data.time_detail}</Text>
+                                    <Text style={[styles.textP1, { color: this.state.product_id == data.id ? '#fff' : '#000' }]}>$ {data.price}</Text>
+                                </TouchableOpacity>
+                            )
+                        }) : ''}
                     </View>
                     <View style={styles.containerD}>
                         <Text style={[styles.headerText, { justifyContent: 'flex-start', flex: 1 }]}>Quantity</Text>
                         <View style={{ justifyContent: 'flex-end' }}>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-                                <View style={styles.containerDa}>
+                                <TouchableOpacity style={styles.containerDa} onPress={this.decreaseItem} >
                                     <Text style={{ alignSelf: 'center', fontSize: wp('5%') }}>-</Text>
-                                </View>
-                                <Text style={{ alignSelf: 'center',fontFamily:fontBold }}>1</Text>
-                                <View style={styles.containerDa}>
+                                </TouchableOpacity>
+                                <Text style={[styles.textP]}>{this.state.quantity}</Text>
+                                <TouchableOpacity style={styles.containerDa} onPress={this.incrementItem} >
                                     <Text style={{ alignSelf: 'center', fontSize: wp('5%') }}>+</Text>
-                                </View>
+                                </TouchableOpacity>
                             </View>
                         </View>
                     </View>
                     <View style={{ alignSelf: 'center' }}>
                         <Button
                             buttonStyle={[styles.buttonstyle, { backgroundColor: '#1AB31A' }]}
-                            title='CHECKOUT'
+                            title='NEXT'
                             color='#fff'
                             titleStyle={styles.buttonText}
-                        // onPress={()=> navigate('test1')}
+                            onPress={() => this.goNext()}
+
                         />
                     </View>
                 </View>
@@ -140,7 +185,7 @@ const styles = StyleSheet.create({
         marginRight: wp('2%'),
     },
     buttonstyle: {
-        padding:1,
+        padding: 1,
         marginTop: hp('3%'),
         width: wp('50%'),
         height: hp('6%'),

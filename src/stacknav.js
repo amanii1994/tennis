@@ -13,7 +13,8 @@ import SummerA from './summerA';
 import TinyClass from './tinyClass';
 import ReferFrnd from './referFrnd';
 import Livestream from './livestream';
-import Playlist from './playlist';
+// import Playlist from './playlist';
+import Music from './music';
 import PrivacyPolicy from './privacyPolicy';
 import Termc from './term&conditions';
 import Giftcard from './giftcard';
@@ -32,7 +33,8 @@ const drawernav = createDrawerNavigator({
     tinyClass:{screen:TinyClass},
     referFrnd:{screen:ReferFrnd},
     livestream:{screen:Livestream},
-    playlist:{screen:Playlist},
+    // playlist:{screen:Playlist},
+    Music:{screen:Music},
     privacypolicy:{screen:PrivacyPolicy},
     termC:{screen:Termc},
     giftcard:{screen: Giftcard},

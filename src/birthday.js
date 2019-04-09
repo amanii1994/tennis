@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, TouchableWithoutFeedback, TouchableOpacity, Platform, Image, Keyboard } from 'react-native';
+import { View, StyleSheet, Text, TouchableWithoutFeedback, TouchableOpacity, Platform, Image, Keyboard ,AsyncStorage} from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { Button } from 'react-native-elements';
 import StatusBar from './statusBar';
@@ -12,12 +12,33 @@ const fontReg = (Platform.OS === 'ios') ? 'Montserrat-Regular' : 'Montserrat-Reg
 const fontMed = (Platform.OS === 'ios') ? 'Montserrat-Medium' : 'Montserrat-Medium';
 const fontSemiBold = (Platform.OS === 'ios') ? 'Montserrat-SemiBold' : 'Montserrat-SemiBold';
 const fontBold = (Platform.OS === 'ios') ? 'Montserrat-Bold' : 'Montserrat-Bold';
+import Constants from './constants';
+const imgUrl = Constants.IMAGE_URL;
 export default class birthday extends Component {
+    _isMounted = false;
     constructor(props) {
         super(props);
         this.state = {
             selectedDate: new Date(),
+            activity: {},
+            products:{}
         };
+    }
+    componentDidMount() {
+        this._isMounted = true;
+        if (this._isMounted) {
+            AsyncStorage.getItem("appData").then((info) => {
+                if (info) {
+                    let dt = JSON.parse(info);
+                    let itemId = this.props.navigation.getParam('itemId');
+                    this.setState({ activity: dt.activities[itemId]});
+                    this.setState({ products: dt.activities[itemId].products});
+                }
+            });
+        }
+    }
+    componentWillUnmount() {
+        this._isMounted = false;
     }
     _updateWeek(val){
         if(this.state.selectedDate > val){
@@ -34,15 +55,15 @@ export default class birthday extends Component {
                     <StatusBar backgroundColor="#282828" barStyle="light-content" />
                     <View style={styles.container}>
                         <View style={{ width: wp('100%'), height: hp('23 %'), backgroundcolor: '' }}>
-                            <Image source={require('./img/dropin6.png')} style={{ flex: 1, height: undefined, width: undefined, }} resizeMode="cover" />
+                            <Image source={{uri:imgUrl+this.state.activity.image}} style={{ flex: 1, height: undefined, width: undefined, }} resizeMode="cover" />
                         </View>
-                        <Linericon name="Group-102" size={wp('6%')} color='#000000' style={{ position: 'absolute', top: 0, left: 0, margin: wp('3%') }} onPress={() => navigate('home')} />
+                        <Linericon name="left-arrow-1" size={wp('6%')} color='#000000' style={{ position: 'absolute', top: 0, left: 0, margin: wp('3%') }} onPress={() => navigate('home')} />
                     </View>
                     <View style={{ margin: wp('4%') }}>
-                        <Text style={styles.headerText}>Birthday / Events</Text>
+                        <Text style={styles.headerText}>{this.state.activity.activity_name}</Text>
                     </View>
                     <View style={{ marginLeft: wp('4%'), marginRight: wp('3%') }}>
-                        <Text style={styles.textP}>Tennis parties are very expensive and limited, but a Tiny Tennis party is double AA... Awesome and Affordable. It’s like Tennis and Mario Brothers merged. We supply the court, racquets, balls and instructor. It’s “Awesome”</Text>
+                        <Text style={styles.textP}>{this.state.activity.description}</Text>
                     </View>
                     <View style={{  marginLeft: wp('4%'), marginTop: wp('2%') }}>
                         <Text style={styles.headerText}>Date of Event</Text>

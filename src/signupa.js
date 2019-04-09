@@ -10,8 +10,9 @@ const fontReg = (Platform.OS === 'ios') ? 'Montserrat-Regular' : 'Montserrat-Reg
 const fontMed = (Platform.OS === 'ios') ? 'Montserrat-Medium' : 'Montserrat-Medium';
 const fontSemiBold = (Platform.OS === 'ios') ? 'Montserrat-SemiBold' : 'Montserrat-SemiBold';
 const fontBold = (Platform.OS === 'ios') ? 'Montserrat-Bold' : 'Montserrat-Bold';
-import Constants from './constants';
 import Loader from './loader';
+import restapi from './class/restapi';
+import Constants from './constants';
 const apiUrl = Constants.WITHOUT_AUTH_API_URL;
 export default class signupa extends Component {
     constructor(props) {
@@ -122,31 +123,21 @@ export default class signupa extends Component {
                     AsyncStorage.setItem("userdata", JSON.stringify(userData));
                 }
             });
-            // check email function
-            fetch(apiUrl + 'checkEmail', {
-                method: 'POST',
-                headers: new Headers({
-                    'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
-                }),
-                body: 'email=' + this.state.email
-            }).then((response) => //{console.log(response)
-                response.json())
-                .then((responseJson) => {
-                    this.setState({ loading: false });
-                    if (responseJson.status == 'success') {
+            let res = restapi.post(apiUrl+'checkEmail', { email: this.state.email});
+            res.then(res => {
+                    if (res.status == 'success') {
                         this.props.navigation.navigate('signupb');
                     } else {
-                        alert(responseJson.msg);
+                        alert(res.msg);
                     }
-                    console.log(responseJson);
-                }).catch((error) => {
-                    console.error(error);
-                    this.setState({ loading: false });
-                    if (error == 'TypeError: Network request failed') {
-                        Alert.alert('Something went wrong', 'Kindly check if the device is connected to stable cellular data plan or WiFi.');
-                    }
-                });
-            this.setState({ loading: false });
+            })
+            .then(this.setState({loading: false}))
+            .catch(err => {
+                this.setState({ loading: false });
+                if (err == 'TypeError: Network request failed') {
+                    Alert.alert('Something went wrong', 'Kindly check if the device is connected to stable cellular data plan or WiFi.');
+                }
+            });
         }
     }
     render() {

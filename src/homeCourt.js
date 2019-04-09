@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, TouchableWithoutFeedback, TouchableOpacity,Platform, Image, Keyboard } from 'react-native';
+import { View, StyleSheet, Text, TouchableWithoutFeedback, Alert,TouchableOpacity, Platform, Image, Keyboard, AsyncStorage } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { Button } from 'react-native-elements';
 import StatusBar from './statusBar';
@@ -10,7 +10,66 @@ const fontReg = (Platform.OS === 'ios') ? 'Montserrat-Regular' : 'Montserrat-Reg
 const fontMed = (Platform.OS === 'ios') ? 'Montserrat-Medium' : 'Montserrat-Medium';
 const fontSemiBold = (Platform.OS === 'ios') ? 'Montserrat-SemiBold' : 'Montserrat-SemiBold';
 const fontBold = (Platform.OS === 'ios') ? 'Montserrat-Bold' : 'Montserrat-Bold';
+import Constants from './constants';
+const imgUrl = Constants.IMAGE_URL;
 export default class homeCourt extends Component {
+    _isMounted = false;
+    constructor(props) {
+        super(props);
+        this.state = {
+            activity: {},
+            products: [],
+            product_id:0,
+            quantity:1,
+            price:'',
+            activity_id:''
+        };
+    }
+    setActive(id,price) {
+        this.setState({
+            product_id:id,
+            price:price
+        });
+    }
+    incrementItem=()=>{
+        if(this.state.quantity <= 5){
+            this.setState({quantity:this.state.quantity + 1});
+        }   
+    }
+    decreaseItem=()=>{
+        if(this.state.quantity > 1){
+            this.setState({ quantity:this.state.quantity - 1});
+        }   
+       }
+    componentDidMount() {
+        this._isMounted = true;
+        if (this._isMounted) {
+            AsyncStorage.getItem("appData").then((info) => {
+                if (info) {
+                    let dt = JSON.parse(info);
+                    let itemId = this.props.navigation.getParam('itemId');
+                    this.setState({ activity: dt.activities[itemId], activity_id: dt.activities[itemId].id, products: dt.activities[itemId].products });
+                }
+            });
+        }
+
+    }
+    goNext() {
+        if (this.state.quantity && this.state.price) {
+            this.props.navigation.navigate('homeCourtD', {
+                itemId : this.props.navigation.getParam('itemId'),
+                activity_id: this.state.activity_id,
+                product_id: this.state.product_id,
+                price: this.state.price,
+                quantity: this.state.quantity
+            })
+        } else {
+            Alert.alert('Please select Price and duration!');
+        }
+    }
+    componentWillUnmount() {
+        this._isMounted = false;
+    }
     render() {
         const { navigate } = this.props.navigation;
         return (
@@ -18,42 +77,52 @@ export default class homeCourt extends Component {
                 <View style={{ backgroundColor: '#fff', width: '100%', height: '100%' }}>
                     <StatusBar backgroundColor="#282828" barStyle="light-content" />
                     <View style={styles.container}>
-                    
+
                         <View style={{ width: wp('100%'), height: hp('23 %'), backgroundcolor: '' }}>
-                                <Image source={require('./img/dropin5.png')} style={{ flex: 1, height: undefined, width: undefined, }} resizeMode="cover" />
+                            <Image source={{ uri: imgUrl + this.state.activity.image }} style={{ flex: 1, height: undefined, width: undefined, }} resizeMode="cover" />
                         </View>
-                        <Linericon name="Group-102" size={wp('6%')} color='#000000' style={{ position: 'absolute', top: 0, left: 0, margin: wp('3%') }} onPress={()=> navigate('home')}/>
+                        <Linericon name="left-arrow-1" size={wp('6%')} color='#000000' style={{ position: 'absolute', top: 0, left: 0, margin: wp('3%') }} onPress={() => navigate('home')} />
                     </View>
                     <View style={{ flexDirection: 'row', margin: wp('4%') }}>
-                        <Text style={styles.headerText}>Home Court Advantage</Text>
+                        <Text style={styles.headerText}>{this.state.activity.activity_name}</Text>
                     </View>
                     <View style={[{ marginLeft: wp('4%'), marginRight: wp('3%') }]}>
-                        <Text style={styles.textP}>We will bring the fun, fitness, learning and the court to you in the privacy of your home. All you need is a 22x10ft or 15x10ft space for our court and we will supply the rest.</Text>
+                        <Text style={styles.textP}>{this.state.activity.description}</Text>
                     </View>
                     <View style={{ margin: wp('4%') }}>
                         <Text style={styles.headerText}>Let's Play</Text>
                     </View>
-                    <TouchableOpacity style={{ flexDirection: 'row', alignSelf: 'center', justifyContent: 'space-around' }}>
-                        <View style={[styles.containerC, { padding: wp('2%') }]}>
-                            <Text style={[styles.headerText, { alignSelf: 'center', justifyContent: 'flex-start', flex: 1,fontSize:wp('4%'),fontFamily:fontReg }]}>Private 1hr</Text>
-                            <Text style={[styles.textP, { justifyContent: 'flex-end',fontSize:wp('4%') }]}>$ 80</Text>
+                    {this.state.products ? this.state.products.map((data) => {
+                            return (
+                                <TouchableOpacity style={{ flexDirection: 'row', alignSelf: 'center', justifyContent: 'space-around' }} key={data.id} onPress={() => { this.setActive(data.id,data.price) }}>
+                                    <View style={[styles.containerC, { padding: wp('2%'),backgroundColor:this.state.product_id==data.id?'#1AB31A':'transparent',borderColor:this.state.product_id==data.id?'#1AB31A':'#000' }]}>
+                                        <Text style={[styles.headerText, { alignSelf: 'center', justifyContent: 'flex-start', flex: 1, fontSize: wp('4%'), fontFamily: fontReg, color:this.state.product_id==data.id?'#fff':'#000' }]}>{data.time_detail}</Text>
+                                        <Text style={[styles.textP1, { justifyContent: 'flex-end', color:this.state.product_id==data.id?'#fff':'#000'}]}>$ {data.price}</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            )
+                        }) : ''}
+                    <View style={styles.containerD}>
+                        <Text style={[styles.headerText, { justifyContent: 'flex-start', flex: 1 }]}>Quantity</Text>
+                        <View style={{ justifyContent: 'flex-end' }}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+                            <TouchableOpacity style={styles.containerDa} onPress={this.decreaseItem} >
+                                    <Text style={{ alignSelf: 'center', fontSize: wp('5%') }}>-</Text>
+                                </TouchableOpacity>
+                                <Text style={[styles.textP]}>{this.state.quantity}</Text>
+                                <TouchableOpacity style={styles.containerDa} onPress={this.incrementItem} > 
+                                    <Text style={{ alignSelf: 'center', fontSize: wp('5%') }}>+</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={{ flexDirection: 'row', alignSelf: 'center', justifyContent: 'space-around', }}>
-                        <View style={[styles.containerCA, { padding: wp('2%'),backgroundColor: '#1AB31A' }]}>
-                            <Text style={[styles.headerText, { alignSelf: 'center', justifyContent: 'flex-start', flex: 1,fontSize:wp('4%'),color:'#fff',fontFamily:fontSemiBold }]}>Group 1hr</Text>
-                            <Text style={[styles.textP, { justifyContent: 'flex-end',fontSize:wp('4%'),color:'#fff',fontFamily:fontSemiBold }]}>$ 100</Text>
-                        </View>
-                    </TouchableOpacity>
-
-                   
+                    </View>
                     <View style={{ alignSelf: 'center' }}>
                         <Button
                             buttonStyle={[styles.buttonstyle, { backgroundColor: '#fff' }]}
                             title='NEXT'
                             color='#000'
                             titleStyle={styles.buttonText}
-                            onPress={()=> navigate('homeCourtA')}
+                            onPress={() => this.goNext()}
                         />
                     </View>
                 </View>
@@ -68,8 +137,8 @@ const styles = StyleSheet.create({
     containerB: {
         marginLeft: wp('2%'),
         width: wp('30%'),
-        height:hp('4%'),
-        justifyContent:'center',
+        height: hp('4%'),
+        justifyContent: 'center',
         backgroundColor: '#2F610D',
         borderRadius: wp('10%')
     },
@@ -98,33 +167,44 @@ const styles = StyleSheet.create({
         borderRadius: wp('3%'),
         margin: wp('2%')
     },
+    textP1: {
+        color: '#000000',
+        fontFamily: fontBold,
+        fontSize: wp('3.5%'),
+        alignSelf: 'center'
+    },
     textP: {
         color: '#000000',
         fontFamily: fontReg,
         fontSize: wp('3.5%'),
         alignSelf: 'center',
-        lineHeight:hp('2.5%')
+        lineHeight: hp('2.5%')
     },
     buttonstyle: {
-        padding:1,
+        padding: 1,
         marginTop: hp('3%'),
         width: wp('50%'),
         height: hp('6%'),
         backgroundColor: '#fff',
-        borderColor:'#000',
-        borderWidth:wp('0.5%'),
+        borderColor: '#000',
+        borderWidth: wp('0.5%'),
         borderRadius: 24,
     },
     buttonText: {
         color: '#000',
         fontFamily: fontSemiBold
     },
-    containerDa:{ 
-        width: wp('8%'), 
-        height: wp('8%'), 
-        borderRadius: wp('4%'), 
+    containerDa: {
+        width: wp('8%'),
+        height: wp('8%'),
+        borderRadius: wp('4%'),
         borderWidth: wp('0.2%'),
-        marginLeft:wp('2%'),
-        marginRight:wp('2%'),
+        marginLeft: wp('2%'),
+        marginRight: wp('2%'),
+    },
+    containerD: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        margin: wp('4%')
     },
 })

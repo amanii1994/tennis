@@ -6,10 +6,14 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
+ import SplashScreen from 'react-native-splash-screen';
 export default class AuthLoadingScreen extends Component  {
   constructor(props) {
     super(props);
     this._bootstrapAsync();
+  }
+  componentDidMount(){
+    SplashScreen.hide();
   }
   // Fetch the token from storage then navigate to our appropriate place
   _bootstrapAsync = async () => {
@@ -18,6 +22,7 @@ export default class AuthLoadingScreen extends Component  {
     // screen will be unmounted and thrown away.
     this.props.navigation.navigate(userToken ? 'App' : 'Auth');
   };
+  
   // Render any loading content that you like here
   render() {
     return (

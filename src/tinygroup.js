@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { View, StyleSheet, Text, TouchableWithoutFeedback, TouchableOpacity,Platform, Image, Keyboard } from 'react-native';
+ import React, { Component } from 'react';
+import { View, StyleSheet, Text, TouchableWithoutFeedback, Alert,TouchableOpacity,Platform, Image, Keyboard,AsyncStorage } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { Button } from 'react-native-elements';
 import StatusBar from './statusBar';
@@ -10,7 +10,71 @@ const fontReg = (Platform.OS === 'ios') ? 'Montserrat-Regular' : 'Montserrat-Reg
 const fontMed = (Platform.OS === 'ios') ? 'Montserrat-Medium' : 'Montserrat-Medium';
 const fontSemiBold = (Platform.OS === 'ios') ? 'Montserrat-SemiBold' : 'Montserrat-SemiBold';
 const fontBold = (Platform.OS === 'ios') ? 'Montserrat-Bold' : 'Montserrat-Bold';
+import Constants from './constants';
+const imgUrl = Constants.IMAGE_URL;
 export default class tinygroup extends Component {
+    _isMounted = false;
+    constructor(props) {
+        super(props);
+        this.state = {
+            activity: {},
+            products:[],
+            color: '#000000',
+            bgColor: 'transparent',
+            boderColor: '#000000',
+            product_id:0,
+            activity_id:'',
+            price: '',
+            quantity:1
+        };
+    }
+    incrementItem=()=>{
+        if(this.state.quantity < 5){
+            this.setState({quantity:this.state.quantity + 1});
+        }
+    }
+    decreaseItem=()=>{
+        if(this.state.quantity > 1){
+            this.setState({ quantity:this.state.quantity - 1});
+        }
+       }
+    componentDidMount() {
+        this._isMounted = true;
+        if (this._isMounted) {
+            AsyncStorage.getItem("appData").then((info) => {
+                if (info) {
+                    let dt = JSON.parse(info);
+                    let itemId = this.props.navigation.getParam('itemId');
+                    this.setState({ activity: dt.activities[itemId],activity_id: dt.activities[itemId].id,products: dt.activities[itemId].products});
+                }
+            });
+        }
+    }
+    goNext(){
+        if(this.state.quantity && this.state.price){
+            this.props.navigation.navigate('tinygroupA', {
+                itemId: this.props.navigation.getParam('itemId'),
+                activity_id: this.state.activity_id,
+                product_id: this.state.product_id,
+                price: this.state.price,
+                quantity: this.state.quantity
+            })
+        }else{
+            Alert.alert('Please select Price and duration!');
+        }
+    }
+    setActive(id,price){
+        this.setState({
+            color: '#fff',
+            bgColor: '#1AB31A',
+            boderColor: '#1AB31A',
+            product_id:id,
+            price:price
+        });
+    }
+    componentWillUnmount() {
+        this._isMounted = false;
+    }
     render() {
         const { navigate } = this.props.navigation;
         return (
@@ -20,43 +84,45 @@ export default class tinygroup extends Component {
                     <View style={styles.container}>
                         {/* <Image source={require('./img/dropin.png')} /> */}
                         <View style={{ width: wp('100%'), height: hp('23 %'), backgroundcolor: '' }}>
-                                <Image source={require('./img/dropin3.png')} style={{ flex: 1, height: undefined, width: undefined, }} resizeMode="cover" />
+                                <Image source={{uri:imgUrl+this.state.activity.image}}  style={{ flex: 1, height: undefined, width: undefined, }} resizeMode="cover" />
                         </View>
-                        <Linericon name="Group-102" size={wp('6%')} color='#000000' style={{ position: 'absolute', top: 0, left: 0, margin: wp('3%') }} onPress={()=> navigate('home')}/>
+                        <Linericon name="left-arrow-1" size={wp('6%')} color='#000000' style={{ position: 'absolute', top: 0, left: 0, margin: wp('3%') }} onPress={()=> navigate('home')}/>
                     </View>
                     <View style={{ flexDirection: 'row', margin: wp('4%') }}>
-                        <Text style={styles.headerText}>Tiny Group</Text>
+                        <Text style={styles.headerText}>{this.state.activity.activity_name}</Text>
                         <View style={[styles.containerB,{alignSelf:'center'}]}>
                             <Text style={[styles.textP, { color: '#fff', alignSelf: 'center',fontFamily:fontSemiBold }]}>Ages 4-8</Text>
                         </View>
                     </View>
                     <View style={[{ marginLeft: wp('4%'), marginRight: wp('3%') }]}>
-                        <Text style={styles.textP}>Make it social and join others. invite a bestie, a sibling or several friends to experience Tiny Tennis. Sharing lessons are a great way to learn teamwork, continuity and competition.</Text>
+                        <Text style={styles.textP}>{this.state.activity.description}</Text>
                     </View>
                     <View style={{ margin: wp('4%') }}>
                         <Text style={styles.headerText}>Let's Play</Text>
                     </View>
-                    <View style={{ flexDirection: 'row', alignSelf: 'center', justifyContent: 'space-around' }}>
-                        <View style={[styles.containerC, { padding: wp('2%') }]}>
-                            <Text style={[styles.headerText, { alignSelf: 'center', justifyContent: 'flex-start', flex: 1,fontSize:wp('4%'),fontFamily:fontReg }]}>45 min</Text>
-                            <Text style={[styles.textP, { justifyContent: 'flex-end',fontSize:wp('4%') }]}>$ 25</Text>
-                        </View>
+                    <View style={{ flexDirection: 'row', alignSelf: 'center', justifyContent: 'space-around' }}> 
+                        {this.state.products?this.state.products.map((data) => {
+                        return (
+                            <TouchableOpacity style={[styles.containerC, { padding: wp('2%'),backgroundColor:this.state.bgColor, borderColor: this.state.boderColor, }]} key={data.id} onPress={()=>{this.setActive(data.id,data.price)}}>
+                                <Text style={[styles.headerText, { alignSelf: 'center', justifyContent: 'flex-start', flex: 1,fontSize:wp('4%'),fontFamily:fontReg ,color:this.state.color}]}>{data.time_detail}</Text>
+                                <Text style={[styles.textP1, { justifyContent: 'flex-end',color:this.state.color}]}>$ {data.price}</Text>
+                            </TouchableOpacity>
+                        )
+                        }):''}            
                     </View>
-                    <TouchableOpacity style={{ flexDirection: 'row', alignSelf: 'center' }}>
+                    {/* <TouchableOpacity style={{ flexDirection: 'row', alignSelf: 'center' }}>
                         <View style={[styles.containerC, {width:wp('86%')}]}>
-                            <Text style={[styles.textP, { alignSelf: 'center',fontSize:wp('4%') }]}> LOCATIONS</Text>
-
+                            <Text style={[styles.textP, { alignSelf: 'center' }]}> LOCATIONS</Text>
                         </View>
-                    </TouchableOpacity>
-
+                    </TouchableOpacity> */}
                     <View style={{ alignSelf:'center', flexDirection:'row', marginTop:wp('1%') }}>
-                            <View style={styles.containerDa}>
+                            <TouchableOpacity style={styles.containerDa} onPress={this.decreaseItem} >
                                <Text style ={{alignSelf:'center',fontSize:wp('5%')}}>-</Text>
-                            </View>
-                            <Text style={{alignSelf:'center'}}>1</Text>
-                            <View style={styles.containerDa}>
+                            </TouchableOpacity>
+                            <Text style={[styles.textP]}>{this.state.quantity}</Text>
+                            <TouchableOpacity style={styles.containerDa} onPress={this.incrementItem} >
                                <Text style ={{alignSelf:'center',fontSize:wp('5%')}}>+</Text>
-                            </View>
+                            </TouchableOpacity>
                         </View>
                     <View style={{ alignSelf: 'center' }}>
                         <Button
@@ -64,7 +130,7 @@ export default class tinygroup extends Component {
                             title='NEXT'
                             color='#fff'
                             titleStyle={styles.buttonText}
-                            onPress={()=> navigate('tinygroupA')}
+                            onPress={()=> this.goNext()}
                         />
                     </View>
                 </View>
@@ -93,9 +159,8 @@ const styles = StyleSheet.create({
     {
         width: wp('95%'),
         height: hp('6%'),
-        borderWidth: wp('0.2%'),
+        borderWidth: wp('0.5%'),
         flexDirection: 'row',
-        borderColor: '#000000',
         justifyContent: 'space-around',
         borderRadius: wp('3%'),
         margin: wp('2%')
@@ -105,7 +170,13 @@ const styles = StyleSheet.create({
         fontFamily: fontReg,
         fontSize: wp('3.5%'),
         alignSelf: 'center',
-        lineHeight:hp('2.5%')
+        lineHeight:hp('2.5%'),
+    },
+    textP1: {
+        color: '#000000',
+        fontFamily: fontBold,
+        fontSize: wp('3.5%'),
+        alignSelf: 'center'
     },
     buttonstyle: {
         marginTop: hp('3%'),

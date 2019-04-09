@@ -10,6 +10,7 @@ import Password from './src/password';
 import Rpassword from './src/forgot';
 import Home from './src/home';
 import Dropin from './src/dropin';
+import DropinA from './src/dropinA';
 import Tinygroup from './src/tinygroup';
 import TinygroupA from './src/tinygroupA';
 import TinygroupB from './src/tinygroupB';
@@ -36,10 +37,14 @@ import Playlist from './src/playlist';
 import PrivacyPolicy from './src/privacyPolicy';
 import Termc from './src/term&conditions';
 import Giftcard from './src/giftcard';
+import Filter from './src/filter';
+import HomeCourtD from './src/homeCourtD';
+import Check1 from './src/check1';
 const AppStack = createStackNavigator({ 
   stack: { screen: StackNav, navigationOptions: { header: null } },
   home: { screen: Home, navigationOptions: { header: null } },
   dropin: { screen: Dropin, navigationOptions: { header: null } },
+  dropinA: { screen: DropinA, navigationOptions: { header: null } },
   tinygroup: { screen: Tinygroup, navigationOptions: { header: null } },
   tinygroupA: { screen: TinygroupA, navigationOptions: { header: null } },
   tinygroupB: { screen: TinygroupB, navigationOptions: { header: null } },
@@ -49,6 +54,7 @@ const AppStack = createStackNavigator({
   homeCourt: { screen: HomeCourt, navigationOptions: { header: null } },
   homeCourtA: { screen: HomeCourtA, navigationOptions: { header: null } },
   homeCourtB: { screen: HomeCourtB, navigationOptions: { header: null } },
+  homeCourtD: { screen: HomeCourtD, navigationOptions: { header: null } },
   birthday: { screen: Birthday, navigationOptions: { header: null } },
   birthdayA: { screen: BirthdayA, navigationOptions: { header: null } },
   birthdayB: { screen: BirthdayB, navigationOptions: { header: null } },
@@ -63,7 +69,9 @@ const AppStack = createStackNavigator({
   playlist:{screen:Playlist,navigationOptions: { header: null }},
   privacyPolicy:{screen:PrivacyPolicy,navigationOptions: { header: null }},
   termc: {screen:Termc,navigationOptions: { header: null }},
-  giftcard: {screen:Giftcard,navigationOptions: { header: null }}
+  giftcard: {screen:Giftcard,navigationOptions: { header: null }},
+  filter: {screen: Filter,navigationOptions: { header: null }},
+  check1: {screen: Check1,navigationOptions: { header: null }}
  });
 const AuthStack = createStackNavigator({ 
   welcome: { screen: Welcome, navigationOptions: { header: null } },

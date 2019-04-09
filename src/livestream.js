@@ -42,7 +42,7 @@ export default class livestream extends Component {
                             buttonStyle={[styles.buttonstyle, {}]}
                             title='LIVE STREAM'
                             titleStyle={styles.buttonText}
-                            onPress={() => navigate('homeCourtB')}
+                           
                         />
                     </View>
                     <View style={{ alignSelf: 'center',marginBottom:wp('10%') }}>

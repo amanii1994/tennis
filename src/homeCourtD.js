@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, ScrollView, Platform, Image,Alert, AsyncStorage, TouchableOpacity, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Platform, Alert,Image,AsyncStorage, TouchableOpacity, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import StatusBar from './statusBar';
 import { createIconSetFromIcoMoon } from 'react-native-vector-icons';
 import icoMoonConfig from '../selection.json';
-import Rest from './class/restapi';
 import { Button, Card } from 'react-native-elements';
+import Rest from './class/restapi';
 import { Dropdown } from 'react-native-material-dropdown';
 import CalendarStrip from 'react-native-calendar-strip';
 import moment from 'moment';
@@ -15,8 +15,7 @@ const fontMed = (Platform.OS === 'ios') ? 'Montserrat-Medium' : 'Montserrat-Medi
 const fontSemiBold = (Platform.OS === 'ios') ? 'Montserrat-SemiBold' : 'Montserrat-SemiBold';
 const fontBold = (Platform.OS === 'ios') ? 'Montserrat-Bold' : 'Montserrat-Bold';
 
-export default class tinygroupA extends Component {
-    _isMounted = false;
+export default class homeCourtD extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -39,7 +38,7 @@ export default class tinygroupA extends Component {
                         p.push({ label: data.address, value: data.id });
                     })
                     let itemId = this.props.navigation.getParam('itemId');
-                    this.setState({ location: p, selectedLoc: p[0].value,selectedLabel: p[0].label, sessions: dt.activities[itemId].session });
+                    this.setState({ location: p, selectedLoc: p[0].value, selectedLabel: p[0].label, sessions: dt.activities[itemId].session });
                 }
             });
         }
@@ -47,7 +46,6 @@ export default class tinygroupA extends Component {
     componentWillUnmount() {
         this._isMounted = false;
     }
-
     _updateWeek(val) {
         if (this.state.selectedDate > val) {
             this.setState({ selectedDate: moment(this.state.selectedDate).add(-7, 'days') });
@@ -78,7 +76,7 @@ export default class tinygroupA extends Component {
                      'session_name' : this.state.session_name,
                      'loc_name' : this.state.selectedLabel,
                  };
-                 this.props.navigation.navigate('tinygroupB',{itemData:this.itemdata});
+                 this.props.navigation.navigate('homeCourtA',{itemData:this.itemdata});
             }) 
         }else{
             Alert.alert('Please choose session!');
@@ -91,28 +89,30 @@ export default class tinygroupA extends Component {
                 <View style={{ backgroundColor: '#fff', flex: 1 }}>
                     <StatusBar backgroundColor="#282828" barStyle="light-content" />
                     <View style={styles.container}>
-                        <TouchableOpacity style={{ alignSelf: 'center', marginLeft: wp('3%'), }} onPress={() => navigate('tinygroup')}><Linericon name="left-arrow-1" size={wp('4.5%')} color='#000000' /></TouchableOpacity>
-                        <View style={{ flex: 6, justifyContent: 'center' }}><Text style={[styles.headerText, { fontSize: wp('5'), fontFamily: fontMed }]}>Calendar</Text></View>
+                        <TouchableOpacity style={{ alignSelf: 'center', marginLeft: wp('3%'), }} onPress={() => navigate('homeCourt')}><Linericon name="left-arrow-1" size={wp('5%')} color='#000000' /></TouchableOpacity>
+                        <View style={{ flex: 6, justifyContent: 'center' }}><Text style={[styles.headerText, { fontSize: wp('5'),fontFamily:fontMed }]}>Find a class</Text></View>
                     </View>
                     <View style={{ width: wp('60%'), marginLeft: wp('1%') }}>
                         <Dropdown
-                            itemTextStyle={{ fontFamily: fontBold }}
+                            itemTextStyle={{fontFamily:fontBold}}
                             inputContainerStyle={{ borderBottomColor: 'transparent' }}
                             fontFamily={fontBold}
                             dropdownPosition={0}
                             label=''
                             data={this.state.location}
                             value={this.state.selectedLoc}
-                            baseColor={'#000'}
+                            baseColor ={'#000'}
                             onChangeText={(value,index) => { this.setState({ selectedLoc: value , selectedLabel:this.state.location[index].label}) }}
                         />
                     </View>
                     <ScrollView>
+                        {/* <Card style={{width:wp}}> */}
+                        {/* </Card> */}
                         <View style={{ paddingTop: 20, backgroundColor: '#fff', }}>
                             <CalendarStrip
                                 calendarAnimation={{ type: 'sequence', duration: 30 }}
                                 daySelectionAnimation={{ type: 'border', duration: 200, borderWidth: 1, borderHighlightColor: '#CBCBCB' }}
-                                style={{ height: 100, backgroundColor: '#F7F7F7' }}
+                                style={{ height:100, backgroundColor: '#F7F7F7' }}
                                 calendarHeaderStyle={{ color: 'black' }}
                                 dateNumberStyle={{ color: 'black' }}
                                 dateNameStyle={{ color: 'black' }}
@@ -120,21 +120,22 @@ export default class tinygroupA extends Component {
                                 highlightDateNameStyle={{ color: 'green' }}
                                 disabledDateNameStyle={{ color: 'grey' }}
                                 disabledDateNumberStyle={{ color: 'grey' }}
-                                onWeekChanged={(value) => this._updateWeek(value)}
+                                onWeekChanged = { (value)=>this._updateWeek(value)}
                                 updateWeek={false}
                                 selectedDate={this.state.selectedDate}
                                 iconContainer={{ flex: 0.1 }}
                             />
+                           
                         </View>
                         {this.state.sessions ? this.state.sessions.map((data) => {
                             return (
                                 <View style={[styles.containerCD, { flexDirection: 'row', height: hp('13%'),flexWrap:'wrap'}]} key={data.id}>
                                     <View style={{ width: wp('20%'), height: wp('20%'), alignSelf: 'center' }}>
-                                        <Image source={require('./img/dropin3.png')} style={styles.containerCDb} resizeMode="cover" />
+                                        <Image source={require('./img/dropin5.png')} style={styles.containerCDb} resizeMode="cover" />
                                     </View>
                                     <View style={{ flexDirection:'column',alignSelf: 'center', marginLeft: wp('1%') }}>
                                         <Text style={[styles.textP, { marginBottom: wp('2%'),flexWrap:'wrap',width:wp('50%') }]}>{data.session} - {this.state.selectedLabel}</Text>
-                                        <Text style={styles.textP}>Tiny Group </Text>
+                                        <Text style={styles.textP}>HomeCourt </Text>
                                     </View>
                                     <TouchableOpacity onPress={()=>this.reserve(data.id,data.session)} style={{ 
                                         flex: 1, 
@@ -150,6 +151,7 @@ export default class tinygroupA extends Component {
                                 </View>
                             )
                         }) : ''}
+                        
                         <View style={{ alignSelf: 'center' }}>
                             <Button
                                 buttonStyle={[styles.buttonstyle, { backgroundColor: '#1AB31A' }]}
@@ -159,6 +161,7 @@ export default class tinygroupA extends Component {
                                 onPress={() => this.goNext()}
                             />
                         </View>
+
                     </ScrollView>
                 </View>
         )
@@ -210,8 +213,8 @@ const styles = StyleSheet.create({
     containerCD:
     {
         flexDirection: 'column',
-        width: wp('98%'), 
-        borderRadius: wp('2%'),
+        height: hp('18%'),
+        width: wp('98%'), borderRadius: wp('2%'),
         marginTop: wp('5%'),
         marginBottom: wp('5%'),
         borderRadius: wp('2%'),
@@ -239,7 +242,7 @@ const styles = StyleSheet.create({
         borderRadius: wp('9%'), margin: wp('1%')
     },
     buttonstyle: {
-        padding: 1,
+        padding:1,
         marginTop: hp('3%'),
         width: wp('50%'),
         height: hp('6%'),

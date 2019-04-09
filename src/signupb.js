@@ -81,7 +81,7 @@ export default class login extends Component {
                     <Loader
                         loading={this.state.loading} />
                     <View style={styles.container}>
-                        <Text style={[styles.headerS, { fontFamily: fontBold, color: 'black' }]}>Let's Keep in touch!</Text>
+                        <Text style={[styles.headerS, { fontFamily: fontBold, color: 'black',marginBottom:wp('3%') }]}>Let's Keep in touch!</Text>
                      <Text style={[styles.headerS, { fontSize: wp('4%'),fontFamily: fontSemiBold, color: '#828282' }]}>
                             Tiny Tennis will text you when your child’sDrop In starts and ends.
                         </Text>
