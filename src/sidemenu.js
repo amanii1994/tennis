@@ -1,19 +1,25 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { NavigationActions } from 'react-navigation';
+import { NavigationActions,NavigationEvents } from 'react-navigation';
 import { ScrollView, TouchableOpacity, AsyncStorage, Text, StyleSheet, View, Image, Platform } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import restapi from './class/restapi';
 import config from './config';
 import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+
 const fontReg = (Platform.OS === 'ios') ? 'Montserrat-Regular' : 'Montserrat-Regular';
 const fontMed = (Platform.OS === 'ios') ? 'Montserrat-Medium' : 'Montserrat-Medium';
 const fontSemiBold = (Platform.OS === 'ios') ? 'Montserrat-SemiBold' : 'Montserrat-SemiBold';
 const fontBold = (Platform.OS === 'ios') ? 'Montserrat-Bold' : 'Montserrat-Bold';
 class SideMenu extends Component {
+  _isMounted = false;
   constructor(props) {
     super(props);
+    this.state = {
+      userInfo:'',
+      error:''
+    }
   }
   _signOut = async () => {
     try {
@@ -38,10 +44,13 @@ class SideMenu extends Component {
       });
     }
   }
-  async componentDidMount() {
-    this._configureGoogleSignIn();
-    await this._getCurrentUser();
-  }
+  // async componentDidMount() {
+  //   this._isMounted = true;
+  //   if (this._isMounted) { 
+  //     this._configureGoogleSignIn();
+  //     await this._getCurrentUser();
+  //   } 
+  // }
   _configureGoogleSignIn() {
     GoogleSignin.configure({
       webClientId: (Platform.OS === 'ios') ? config.webClientIdIos : config.webClientId,
@@ -49,14 +58,27 @@ class SideMenu extends Component {
     });
   }
   _logout() {
-    let usrdata = restapi.getCurrentUser('authData');
-    usrdata.then((userData) => {
-      if (userData.type == 'google') {
-        this._signOut();
+    AsyncStorage.getItem("userType").then((info) => {
+      if (info) {
+          if(info != 'guest'){
+              AsyncStorage.getItem("authData").then((info) => {
+                if (info) {  
+                    let dt = JSON.parse(info);
+                    console.log(dt);
+                    if(dt.type == 'google'){
+                      this._signOut();
+                    }
+                    AsyncStorage.clear();
+                    this.props.navigation.navigate('Auth');
+                }
+              });
+          }else{
+            AsyncStorage.clear();
+            this.props.navigation.navigate('Auth');
+          }
       }
-    })
-    AsyncStorage.clear();
-    this.props.navigation.navigate('Auth');
+    }).done();
+   
   }
   navigateToScreen = (route) => () => {
     const navigateAction = NavigationActions.navigate({
@@ -64,6 +86,10 @@ class SideMenu extends Component {
     });
     this.props.navigation.dispatch(navigateAction);
   }
+  componentWillUnmount() {
+    console.log('hjhsjhd');
+    this._isMounted = false;
+}
   render() {
     const { navigate } = this.props.navigation;
     return (
@@ -71,7 +97,11 @@ class SideMenu extends Component {
         <View style={[styles.container, { flex: 2 }]}>
           <Text style={styles.headerText}>MENU</Text>
           <View style={{ flexDirection: 'column', margin: wp('5%') }}>
-            <TouchableOpacity style={styles.containerA} onPress={() => navigate('tinyClass')}  >
+            <TouchableOpacity style={styles.containerA} onPress={() => this.props.navigation.dispatch(
+  NavigationActions.navigate({
+    routeName: 'tinyClass',
+  }),
+)}  >
 
               <View style={[styles.imgContainer, { width: wp(4.5), height: wp('6.3') }]}>
                 <Image source={require('./img/tinyClass.png')} style={styles.imgStyle} resizeMode="cover" />

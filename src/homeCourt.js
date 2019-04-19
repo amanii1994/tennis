@@ -25,10 +25,11 @@ export default class homeCourt extends Component {
             activity_id:''
         };
     }
-    setActive(id,price) {
+    setActive(id,price,time) {
         this.setState({
             product_id:id,
-            price:price
+            price:price,
+            time_detail:time
         });
     }
     incrementItem=()=>{
@@ -61,7 +62,10 @@ export default class homeCourt extends Component {
                 activity_id: this.state.activity_id,
                 product_id: this.state.product_id,
                 price: this.state.price,
-                quantity: this.state.quantity
+                quantity: this.state.quantity,
+                activity_name:this.state.activity.activity_name,
+                time_detail:this.state.time_detail,
+                total_price:this.state.price * this.state.quantity
             })
         } else {
             Alert.alert('Please select Price and duration!');
@@ -94,7 +98,7 @@ export default class homeCourt extends Component {
                     </View>
                     {this.state.products ? this.state.products.map((data) => {
                             return (
-                                <TouchableOpacity style={{ flexDirection: 'row', alignSelf: 'center', justifyContent: 'space-around' }} key={data.id} onPress={() => { this.setActive(data.id,data.price) }}>
+                                <TouchableOpacity style={{ flexDirection: 'row', alignSelf: 'center', justifyContent: 'space-around' }} key={data.id} onPress={() => { this.setActive(data.id,data.price,data.time_detail) }}>
                                     <View style={[styles.containerC, { padding: wp('2%'),backgroundColor:this.state.product_id==data.id?'#1AB31A':'transparent',borderColor:this.state.product_id==data.id?'#1AB31A':'#000' }]}>
                                         <Text style={[styles.headerText, { alignSelf: 'center', justifyContent: 'flex-start', flex: 1, fontSize: wp('4%'), fontFamily: fontReg, color:this.state.product_id==data.id?'#fff':'#000' }]}>{data.time_detail}</Text>
                                         <Text style={[styles.textP1, { justifyContent: 'flex-end', color:this.state.product_id==data.id?'#fff':'#000'}]}>$ {data.price}</Text>

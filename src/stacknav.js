@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { AppRegistry, Dimensions } from 'react-native';
-import { createDrawerNavigator, createAppContainer,DrawerItems } from 'react-navigation';
+import { createDrawerNavigator, createAppContainer,DrawerItems,createStackNavigator } from 'react-navigation';
 import SideMenu from './sidemenu'
 import Home from './home';
 import Dropin from './dropin';
@@ -18,30 +18,34 @@ import Music from './music';
 import PrivacyPolicy from './privacyPolicy';
 import Termc from './term&conditions';
 import Giftcard from './giftcard';
-class stack extends Component{
-    
-}
-const drawernav = createDrawerNavigator({
-    home: { screen: Home, },
-    dropin: { screen: Dropin,  },
-    tinygroup: { screen: Tinygroup, },
-    mommymeA: { screen: MommymeA,  },
-    homeCourt: { screen: HomeCourt, },
-    birthday: { screen: Birthday,  },
-    teamTennis: { screen: TeamTennis, },
-    summerA: { screen: SummerA, },
-    tinyClass:{screen:TinyClass},
-    referFrnd:{screen:ReferFrnd},
-    livestream:{screen:Livestream},
+
+const HomeNavigator = createStackNavigator({
+    home: { screen: Home,navigationOptions: { header: null } },
+    dropin: { screen: Dropin, navigationOptions: { header: null } },
+    tinygroup: { screen: Tinygroup,navigationOptions: { header: null } },
+    mommymeA: { screen: MommymeA, navigationOptions: { header: null } },
+    homeCourt: { screen: HomeCourt,navigationOptions: { header: null } },
+    birthday: { screen: Birthday, navigationOptions: { header: null } },
+    teamTennis: { screen: TeamTennis,navigationOptions: { header: null } },
+    summerA: { screen: SummerA,navigationOptions: { header: null } },
+    tinyClass:{screen:TinyClass, navigationOptions: { header: null }},
+    referFrnd:{screen:ReferFrnd, navigationOptions: { header: null }},
+    livestream:{screen:Livestream, navigationOptions: { header: null }},
     // playlist:{screen:Playlist},
-    Music:{screen:Music},
-    privacypolicy:{screen:PrivacyPolicy},
-    termC:{screen:Termc},
-    giftcard:{screen: Giftcard},
+    Music:{screen:Music,navigationOptions: { header: null }},
+    privacypolicy:{screen:PrivacyPolicy,navigationOptions: { header: null }},
+    termC:{screen:Termc,navigationOptions: { header: null }},
+    giftcard:{screen: Giftcard,navigationOptions: { header: null }},
+}, {});
+
+const HomeNavigationDrawer = createDrawerNavigator({
+    HomePage: {
+        screen: HomeNavigator,
+    },
 }, {
-        contentComponent: SideMenu,
-        drawerWidth: Dimensions.get('window').width,
-        drawerBackgroundColor: "transparent ",
-    });
-const MyApp = createAppContainer(drawernav);
+    contentComponent: SideMenu,
+    drawerWidth: Dimensions.get('window').width,
+    drawerBackgroundColor: "transparent ",
+});
+const MyApp = createAppContainer(HomeNavigationDrawer);
 export default MyApp;

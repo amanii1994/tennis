@@ -35,7 +35,9 @@ export default  class summerA extends Component {
                 activity_id: this.state.activity_id,
                 product_id: this.state.product_id,
                 price: this.state.price,
-                quantity: this.state.quantity
+                quantity: this.state.quantity,
+                activity_name: this.state.activity.activity_name,
+                total_price: this.state.price
             })
         } else {
             Alert.alert('Please select Price and duration!');
@@ -59,7 +61,7 @@ export default  class summerA extends Component {
             bgColor: '#1AB31A',
             boderColor: '#1AB31A',
             product_id: id,
-            price: price
+            price: price,
         });
     }
     incrementItem=()=>{

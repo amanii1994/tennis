@@ -1,3 +1,15 @@
+/*
+Copyright 2019 Square Inc.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 import React, { Component } from 'react';
 import { StyleSheet, View, ScrollView, TouchableOpacity, Dimensions, TouchableHighlight, Text, TouchableWithoutFeedback, Platform, Keyboard, Image, AsyncStorage } from 'react-native';
 import StatusBar from './statusBar';
@@ -89,6 +101,15 @@ export default class home extends Component {
     componentWillUnmount() {
         this._isMounted = false;
     }
+    goToNext(){
+        AsyncStorage.getItem("userType").then((info) => {
+            if (info) {
+                if(info != 'guest'){
+                    this.props.navigation.toggleDrawer();
+                }
+            } 
+        });
+    }
     render() {
         
         const { navigate } = this.props.navigation;
@@ -96,7 +117,7 @@ export default class home extends Component {
             <View style={{ backgroundColor: '#fff', width: '100%', height: '100%', paddingBottom: hp('3%') }} >
                 <StatusBar backgroundColor="#282828" barStyle="light-content" />
                 <View style={[styles.container, { marginBottom: wp('3%') }]}>
-                    <Linericon name="Group-102" size={wp('6%')} color="black" style={{ flex: 1, justifyContent: 'flex-start', alignSelf: 'center', marginLeft: wp('3%'), }} onPress={() => this.props.navigation.toggleDrawer()} />
+                    <Linericon name="Group-102" size={wp('6%')} color="black" style={{ flex: 1, justifyContent: 'flex-start', alignSelf: 'center', marginLeft: wp('3%'), }} onPress={() => this.goToNext()} />
                     <View style={{ flex: 6, justifyContent: 'center' }}><Text style={styles.headerText}></Text></View>
                 </View>
                 <View style={{ flexDirection: 'row', justifyContent: 'center', height: hp('10%') }}>

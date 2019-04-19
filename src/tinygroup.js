@@ -57,19 +57,23 @@ export default class tinygroup extends Component {
                 activity_id: this.state.activity_id,
                 product_id: this.state.product_id,
                 price: this.state.price,
-                quantity: this.state.quantity
+                quantity: this.state.quantity,
+                time_detail:this.state.time_detail,
+                activity_name: this.state.activity.activity_name,
+                total_price: this.state.quantity * this.state.price
             })
         }else{
             Alert.alert('Please select Price and duration!');
         }
     }
-    setActive(id,price){
+    setActive(id,price,time){
         this.setState({
             color: '#fff',
             bgColor: '#1AB31A',
             boderColor: '#1AB31A',
             product_id:id,
-            price:price
+            price:price,
+            time_detail:time,
         });
     }
     componentWillUnmount() {
@@ -103,7 +107,7 @@ export default class tinygroup extends Component {
                     <View style={{ flexDirection: 'row', alignSelf: 'center', justifyContent: 'space-around' }}> 
                         {this.state.products?this.state.products.map((data) => {
                         return (
-                            <TouchableOpacity style={[styles.containerC, { padding: wp('2%'),backgroundColor:this.state.bgColor, borderColor: this.state.boderColor, }]} key={data.id} onPress={()=>{this.setActive(data.id,data.price)}}>
+                            <TouchableOpacity style={[styles.containerC, { padding: wp('2%'),backgroundColor:this.state.bgColor, borderColor: this.state.boderColor, }]} key={data.id} onPress={()=>{this.setActive(data.id,data.price,data.time_detail)}}>
                                 <Text style={[styles.headerText, { alignSelf: 'center', justifyContent: 'flex-start', flex: 1,fontSize:wp('4%'),fontFamily:fontReg ,color:this.state.color}]}>{data.time_detail}</Text>
                                 <Text style={[styles.textP1, { justifyContent: 'flex-end',color:this.state.color}]}>$ {data.price}</Text>
                             </TouchableOpacity>

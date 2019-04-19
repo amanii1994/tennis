@@ -18,7 +18,7 @@ export default class birthdayB extends Component {
                 <View style={{ backgroundColor: '#fff', width: '100%', height: '100%', flex: 1 }}>
                     <StatusBar backgroundColor="#282828" barStyle="light-content" />
                     <View style={styles.container}>
-                        <TouchableOpacity style={{ alignSelf: 'center', marginLeft: wp('3%'), }} onPress={() => navigate('birthdayA')}><Linericon name="left-arrow-1" size={wp('5%')} color='#000000' /></TouchableOpacity>
+                        <TouchableOpacity style={{ alignSelf: 'center', marginLeft: wp('3%'), }} onPress={() => navigate('home')}><Linericon name="left-arrow-1" size={wp('5%')} color='#000000' /></TouchableOpacity>
                         <View style={{ flex: 6, justifyContent: 'center' }}><Text style={[styles.headerText, { fontSize: wp('5'),fontFamily:fontMed }]}>Awesome & Affordable</Text></View>
                     </View>
                     <View style={[{ marginLeft: wp('4%'), marginRight: wp('3%'), marginTop:wp('4%'),borderColor:'#D5D5D5',borderWidth:wp('0.3%'),padding:wp('4%') }]}>

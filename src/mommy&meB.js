@@ -61,21 +61,44 @@ export default class mommymeB extends Component {
         let quantity = this.props.navigation.getParam('quantity');
         let price = this.props.navigation.getParam('price');
         let product_id = this.props.navigation.getParam('product_id');
+        let time_detail = this.props.navigation.getParam('time_detail');
+        let activity_name = this.props.navigation.getParam('activity_name');
         if(this.state.session_id){
             Rest.getCurrentUser('authData').then((uData)=>{
-                if(uData!=null)
-                this.itemdata = {
-                     'user_id' : uData.id,
-                     'activity_id' : activity_id,
-                     'quantity' : quantity,
-                     'product_id' : product_id,
-                     'price' : price,
-                     'app_date' : moment(this.state.selectedDate).format('YYYY-MM-DD'),
-                     'location_id' : this.state.selectedLoc,
-                     'session_id': this.state.session_id,
-                     'session_name' : this.state.session_name,
-                     'loc_name' : this.state.selectedLabel,
-                 };
+                if(uData!=null){
+                    this.itemdata = {
+                        'user_id' : uData.id,
+                        'activity_id' : activity_id,
+                        'quantity' : quantity,
+                        'product_id' : product_id,
+                        'price' : price,
+                        'app_date' : moment(this.state.selectedDate).format('YYYY-MM-DD'),
+                        'location_id' : this.state.selectedLoc,
+                        'session_id': this.state.session_id,
+                        'session_name' : this.state.session_name,
+                        'loc_name' : this.state.selectedLabel,
+                        'time_detail' : time_detail,
+                        'activity_name' : activity_name,
+                        'total_price':this.props.navigation.getParam('total_price')
+                    };
+                }else{
+                    this.itemdata = {
+                        'user_id' : 0,
+                        'activity_id' : activity_id,
+                        'quantity' : quantity,
+                        'product_id' : product_id,
+                        'price' : price,
+                        'app_date' : moment(this.state.selectedDate).format('YYYY-MM-DD'),
+                        'location_id' : this.state.selectedLoc,
+                        'session_id': this.state.session_id,
+                        'session_name' : this.state.session_name,
+                        'loc_name' : this.state.selectedLabel,
+                        'time_detail' : time_detail,
+                        'activity_name' : activity_name,
+                        'total_price':this.props.navigation.getParam('total_price')
+                    };
+                }
+               
                  this.props.navigation.navigate('mommymeC',{itemData:this.itemdata});
             }) 
         }else{

@@ -24,6 +24,16 @@ export default class birthday extends Component {
             products:{}
         };
     }
+    goNext(){
+        if(this.state.selectedDate){
+            this.props.navigation.navigate('birthdayA', {
+                activity_id: this.state.activity.id,
+                app_date: moment(this.state.selectedDate).format('YYYY-MM-DD'),
+            })
+        }else{
+            Alert.alert('Please select date!!');
+        }
+    }
     componentDidMount() {
         this._isMounted = true;
         if (this._isMounted) {
@@ -93,7 +103,8 @@ export default class birthday extends Component {
                             title='NEXT'
                             color='#fff'
                             titleStyle={styles.buttonText}
-                            onPress={() => navigate('birthdayA')}
+                            onPress={() => this.goNext()}
+
                         />
                     </View>
                 </View>

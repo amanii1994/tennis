@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, ScrollView, Platform, Alert,Image,AsyncStorage, TouchableOpacity, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Platform, Alert,Image,AsyncStorage, TouchableOpacity, Keyboard, TouchableWithoutFeedback ,TouchableHighlight} from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import StatusBar from './statusBar';
 import { createIconSetFromIcoMoon } from 'react-native-vector-icons';
@@ -14,7 +14,18 @@ const fontReg = (Platform.OS === 'ios') ? 'Montserrat-Regular' : 'Montserrat-Reg
 const fontMed = (Platform.OS === 'ios') ? 'Montserrat-Medium' : 'Montserrat-Medium';
 const fontSemiBold = (Platform.OS === 'ios') ? 'Montserrat-SemiBold' : 'Montserrat-SemiBold';
 const fontBold = (Platform.OS === 'ios') ? 'Montserrat-Bold' : 'Montserrat-Bold';
-
+import Constants from './constants';
+import Modal from 'react-native-modal';
+import {
+    SQIPCardEntry,
+    SQIPApplePay,
+    SQIPCore,
+    SQIPGooglePay,
+} from 'react-native-square-in-app-payments';
+import {
+    printCurlCommand,
+    showAlert,
+} from './Utilities';
 export default class homeCourtD extends Component {
     constructor(props) {
         super(props);
@@ -24,10 +35,35 @@ export default class homeCourtD extends Component {
             selectedLoc: '',
             selectedLabel:'',
             sessions: [],
-            session_id:''
+            session_id:'',
+            showingCardEntry: false,
+            showingBottomSheet: false,
+            userData: {},
         };
+        this.onStartCardEntry = this.startCardEntry.bind(this);
+        this.onShowCardEntry = this.onShowCardEntry.bind(this);
+        this.onCardNonceRequestSuccess = this.onCardNonceRequestSuccess.bind(this);
+        this.onCardEntryCancel = this.onCardEntryCancel.bind(this);
+        this.showOrderScreen = this.showOrderScreen.bind(this);
+        this.closeOrderScreen = this.closeOrderScreen.bind(this);
     }
-    componentDidMount() {
+    applicationIdIsSet() { return Constants.SQUARE_APP_ID !== 'REPLACE_ME'; }
+    chargeServerHostIsSet() { return Constants.CHARGE_SERVER_HOST !== 'REPLACE_ME'; }
+
+    showOrderScreen() {
+        this.setState({ showingBottomSheet: true });
+    }
+    closeOrderScreen() {
+        this.setState({ showingBottomSheet: false });
+    }
+    onShowCardEntry() {
+        this.closeOrderScreen();
+        this.setState({ showingCardEntry: true });
+    }
+    onCardEntryCancel() {
+        this.showOrderScreen();
+    }
+    async componentDidMount() {
         this._isMounted = true;
         if (this._isMounted) {
             AsyncStorage.getItem("appData").then((info) => {
@@ -41,6 +77,40 @@ export default class homeCourtD extends Component {
                     this.setState({ location: p, selectedLoc: p[0].value, selectedLabel: p[0].label, sessions: dt.activities[itemId].session });
                 }
             });
+            AsyncStorage.getItem("authData").then((info) => {
+                if (info) {
+                    let dt = JSON.parse(info);
+                    console.log(dt);
+                    this.setState({ userData: dt });
+                    console.log(this.state.userData)
+                }
+            });
+        }
+        await SQIPCore.setSquareApplicationId(Constants.SQUARE_APP_ID);
+        if (Platform.OS === 'ios') {
+            await SQIPCardEntry.setIOSCardEntryTheme({
+                saveButtonFont: {
+                    size: 30,
+                },
+                saveButtonTitle: 'Pay',
+                keyboardAppearance: 'Light',
+                tintColor: {
+                    r: 36,
+                    g: 152,
+                    b: 141,
+                    a: 0.9,
+                },
+                textColor: {
+                    r: 36,
+                    g: 152,
+                    b: 141,
+                    a: 0.9,
+                },
+            });
+        } else if (Platform.OS === 'android') {
+            await SQIPGooglePay.initializeGooglePay(
+                GOOGLE_PAY_LOCATION_ID, SQIPGooglePay.EnvironmentTest,
+            );
         }
     }
     componentWillUnmount() {
@@ -57,29 +127,116 @@ export default class homeCourtD extends Component {
         this.setState({session_id:id,session_name:name});
     }
     goNext(){
-        let activity_id = this.props.navigation.getParam('activity_id');
-        let quantity = this.props.navigation.getParam('quantity');
-        let price = this.props.navigation.getParam('price');
-        let product_id = this.props.navigation.getParam('product_id');
         if(this.state.session_id){
-            Rest.getCurrentUser('authData').then((uData)=>{
-                if(uData!=null)
-                this.itemdata = {
-                     'user_id' : uData.id,
-                     'activity_id' : activity_id,
-                     'quantity' : quantity,
-                     'product_id' : product_id,
-                     'price' : price,
-                     'app_date' : moment(this.state.selectedDate).format('YYYY-MM-DD'),
-                     'location_id' : this.state.selectedLoc,
-                     'session_id': this.state.session_id,
-                     'session_name' : this.state.session_name,
-                     'loc_name' : this.state.selectedLabel,
-                 };
-                 this.props.navigation.navigate('homeCourtA',{itemData:this.itemdata});
-            }) 
+            AsyncStorage.getItem("userType").then((info) => {
+                if (info) {
+                    if(info == 'guest'){
+                        let saveData = {
+                            'user_id' : 0,
+                            'activity_id' : this.props.navigation.getParam('activity_id'),
+                            'quantity' : this.props.navigation.getParam('quantity'),
+                            'product_id' : this.props.navigation.getParam('product_id'),
+                            'price' : this.props.navigation.getParam('price'),
+                            'app_date' : moment(this.state.selectedDate).format('YYYY-MM-DD'),
+                            'location_id' : this.state.selectedLoc,
+                            'session_id': this.state.session_id,
+                            'session_name' : this.state.session_name,
+                            'loc_name' : this.state.selectedLabel,
+                            'time_detail':this.props.navigation.getParam('time_detail'),
+                            'activity_name':this.props.navigation.getParam('activity_name'),
+                            'total_price' : this.props.navigation.getParam('total_price')
+                        }
+                        this.props.navigation.navigate('guestcheckout',{'saveData': saveData});
+                    }else{
+                        this.showOrderScreen();
+                    }
+                }
+            });   
         }else{
             Alert.alert('Please choose session!');
+        }
+    }
+    checkStateAndPerform() {
+        if (this.state.showingCardEntry) {
+            // if application id is not set, we will let you know where to set it,
+            // but the card entry will still open due to allowing visuals to be shown
+            if (!this.applicationIdIsSet()) {
+                showAlert('Missing Square Application ID',
+                    'To request a nonce, replace SQUARE_APP_ID in Constants.js with an Square Application ID.',
+                    this.startCardEntry);
+            } else {
+                this.startCardEntry();
+            }
+        } else if (this.state.showingDigitalWallet) {
+            this.startDigitalWallet();
+            this.setState({ showingDigitalWallet: false });
+        }
+    }
+    async startCardEntry() {
+        this.setState({ showingCardEntry: false });
+        const cardEntryConfig = {
+            collectPostalCode: true,
+        };
+        await SQIPCardEntry.startCardEntryFlow(
+            cardEntryConfig,
+            this.onCardNonceRequestSuccess,
+            this.onCardEntryCancel,
+        );
+    }
+    async onCardNonceRequestSuccess(cardDetails) {
+        if (this.chargeServerHostIsSet()) {
+            try {
+                console.log(cardDetails);
+                let res = Rest.post(Constants.CHARGE_SERVER_URL, { card_nounce: cardDetails.nonce, amount: this.props.navigation.getParam('price') * this.props.navigation.getParam('quantity'), activity_name: this.props.navigation.getParam('activity_name') });
+                res.then(res => {
+                    if (res.status == 'success') {
+                        let dataSave = {
+                            'user_id' : this.state.userData.id,
+                            'activity_id' : this.props.navigation.getParam('activity_id'),
+                            'quantity' : this.props.navigation.getParam('quantity'),
+                            'product_id' : this.props.navigation.getParam('product_id'),
+                            'price' : this.props.navigation.getParam('price'),
+                            'app_date' : moment(this.state.selectedDate).format('YYYY-MM-DD'),
+                            'location_id' : this.state.selectedLoc,
+                            'session_id': this.state.session_id,
+                            'session_name' : this.state.session_name,
+                            'loc_name' : this.state.selectedLabel,
+                            'time_detail':this.props.navigation.getParam('time_detail'),
+                            'activity_name':this.props.navigation.getParam('activity_name'),
+                            'total_price' : this.props.navigation.getParam('total_price')
+                        };
+                        dataSave.t_id = res.id;
+                        let p = Rest.saveAppoint(dataSave);
+                        p.then((data) => {
+                            console.log(data);
+                        });
+                        SQIPCardEntry.completeCardEntry(() => {
+                            showAlert('Your order was successful',
+                                'Go to your Square dashbord to see this order reflected in the sales tab.');
+                            this.props.navigation.navigate('homeCourtB');
+                        });
+                    } else {
+                        Alert.alert(res.msg);
+                    }
+                }).then(this.setState({ loading: false }))
+                    .catch(err => {
+                        this.setState({ loading: false });
+                        if (err == 'TypeError: Network request failed') {
+                            Alert.alert('Something went wrong', 'Kindly check if the device is connected to stable cellular data plan or WiFi.');
+                        }
+                    });
+
+            } catch (error) {
+                SQIPCardEntry.showCardNonceProcessingError(error.message);
+            }
+        } else {
+            SQIPCardEntry.completeCardEntry(() => {
+                printCurlCommand(cardDetails.nonce);
+                showAlert(
+                    'Nonce generated but not charged',
+                    'Check your console for a CURL command to charge the nonce, or replace CHARGE_SERVER_HOST with your server host.',
+                );
+            });
         }
     }
 
@@ -135,7 +292,7 @@ export default class homeCourtD extends Component {
                                     </View>
                                     <View style={{ flexDirection:'column',alignSelf: 'center', marginLeft: wp('1%') }}>
                                         <Text style={[styles.textP, { marginBottom: wp('2%'),flexWrap:'wrap',width:wp('50%') }]}>{data.session} - {this.state.selectedLabel}</Text>
-                                        <Text style={styles.textP}>HomeCourt </Text>
+                                        <Text style={styles.textP}>{this.props.navigation.getParam('activity_name')} </Text>
                                     </View>
                                     <TouchableOpacity onPress={()=>this.reserve(data.id,data.session)} style={{ 
                                         flex: 1, 
@@ -163,6 +320,118 @@ export default class homeCourtD extends Component {
                         </View>
 
                     </ScrollView>
+                    <Modal
+                    isVisible={this.state.showingBottomSheet}
+                    style={styles.bottomModal}
+                    // onBackdropPress={this.closeOrderScreen}
+                    // set timeout due to iOS needing to make sure modal is closed
+                    // before presenting another view
+                    onModalHide={() => setTimeout(() => this.checkStateAndPerform(), 200)}
+                >
+                    <View style={styles.modalContent}>
+                        <View style={stylesTitle.container}>
+                            <TouchableHighlight
+                                style={stylesTitle.closeButton}
+                                underlayColor="#FFFFFF"
+                                onPress={this.closeOrderScreen}
+                            >
+                                <Image
+                                    style={stylesTitle.button}
+                                    source={require('./images/btnClose.png')}
+                                />
+                            </TouchableHighlight>
+                            <Text style={stylesTitle.title}>Order Information</Text>
+                        </View>
+                        <ScrollView style={stylesBody.bodyContent}>
+                            <View style={stylesBody.row}>
+                                <View style={stylesBody.titleColumn}>
+                                    <Text style={stylesBody.titleText}>Contact Information</Text>
+                                </View>
+                                <View style={stylesBody.descriptionColumn}>
+                                    <Text style={stylesBody.bodyText}>{this.state.userData.user_name}</Text>
+                                    <Text style={stylesBody.bodyText}>{this.state.userData.mobile}</Text>
+                                </View>
+                            </View>
+                            <View style={stylesBody.horizontalLine} />
+                            <View style={stylesBody.row}>
+                                <View style={stylesBody.titleColumn}>
+                                    <Text style={stylesBody.titleText}>Activity Name</Text>
+                                </View>
+                                <View style={stylesBody.descriptionColumn}>
+                                    <Text style={stylesBody.bodyText}>{this.props.navigation.getParam('activity_name')}</Text>
+                                </View>
+                            </View>
+                            <View style={stylesBody.horizontalLine} />
+                            <View style={stylesBody.row}>
+                                <View style={stylesBody.titleColumn}>
+                                    <Text style={stylesBody.titleText}>Quantity</Text>
+                                </View>
+                                <View style={stylesBody.descriptionColumn}>
+                                    <Text style={stylesBody.bodyText}>{this.props.navigation.getParam('quantity')}</Text>
+                                </View>
+                            </View>
+                            <View style={stylesBody.horizontalLine} />
+                            <View style={stylesBody.row}>
+                                <View style={stylesBody.titleColumn}>
+                                    <Text style={stylesBody.titleText}>Location</Text>
+                                </View>
+                                <View style={stylesBody.descriptionColumn}>
+                                    <Text style={stylesBody.bodyText}>{this.state.selectedLabel}</Text>
+                                </View>
+                            </View>
+                            <View style={stylesBody.horizontalLine} />
+                            <View style={stylesBody.row}>
+                                <View style={stylesBody.titleColumn}>
+                                    <Text style={stylesBody.titleText}>Appointment Date</Text>
+                                </View>
+                                <View style={stylesBody.descriptionColumn}>
+                                    <Text style={stylesBody.bodyText}>{moment(this.state.selectedDate).format('YYYY-MM-DD')}</Text>
+                                    <Text style={stylesBody.bodyText}>{this.props.navigation.getParam('time_detail')}</Text>
+                                </View>
+                            </View>
+                            <View style={stylesBody.horizontalLine} />
+                            <View style={stylesBody.row}>
+                                <View style={stylesBody.titleColumn}>
+                                    <Text style={stylesBody.titleText}>Time</Text>
+                                </View>
+                                <View style={stylesBody.descriptionColumn}>
+                                    <Text style={stylesBody.bodyText}>{this.state.session_name}</Text>
+                                </View>
+                            </View>
+                            <View style={stylesBody.horizontalLine} />
+                            <View style={stylesBody.row}>
+                                <View style={stylesBody.titleColumn}>
+                                    <Text style={stylesBody.titleText}>Price</Text>
+                                </View>
+                                <View style={stylesBody.descriptionColumn}>
+                                    <Text style={stylesBody.bodyText}>$ {this.props.navigation.getParam('price')}</Text>
+                                </View>
+                            </View>
+                            <View style={stylesBody.horizontalLine} />
+                            <View style={stylesBody.row}>
+                                <View style={stylesBody.titleColumn}>
+                                    <Text style={stylesBody.titleText}>Total</Text>
+                                </View>
+                                <View style={stylesBody.descriptionColumn}>
+                                    <Text style={stylesBody.bodyText}>$ {this.props.navigation.getParam('price') * (this.props.navigation.getParam('quantity'))}</Text>
+                                </View>
+                            </View>
+                            <View style={stylesBody.horizontalLine} />
+                            <Text style={stylesBody.refundText}>
+                                You can refund this transaction through your Square dashboard,
+                                go to squareup.com/dashboard.
+                            </Text>
+                        </ScrollView>
+                        <View style={stylesBody.buttonRow}>
+                            <TouchableOpacity
+                                onPress={this.onShowCardEntry}
+                                style={stylesBody.button}
+                            >
+                                <Text style={stylesBody.buttonText}>Pay</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
                 </View>
         )
     }
@@ -241,16 +510,102 @@ const styles = StyleSheet.create({
         width: undefined,
         borderRadius: wp('9%'), margin: wp('1%')
     },
-    buttonstyle: {
-        padding:1,
-        marginTop: hp('3%'),
-        width: wp('50%'),
-        height: hp('6%'),
-        backgroundColor: '#fff',
-        borderRadius: 24,
+    modalContent: {
+        alignItems: 'flex-start',
+        backgroundColor: 'white',
+        borderColor: 'rgba(0, 0, 0, 0.1)',
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10,
+        flex: 0,
+        flexShrink: 1,
+        justifyContent: 'flex-start',
+    },
+    bottomModal: {
+        justifyContent: 'flex-end',
+        margin: 0,
+    },
+})
+const stylesTitle = StyleSheet.create({
+    closeButton: {
+        zIndex: 1,
+    },
+    container: {
+        alignItems: 'center',
+        flexDirection: 'row',
+        position: 'relative',
+
+    },
+    title: {
+        color: '#000000',
+        fontSize: 18,
+        fontWeight: 'bold',
+        position: 'absolute',
+        textAlign: 'center',
+        width: '100%',
+        zIndex: 0,
+        fontFamily: fontBold
+    },
+})
+const stylesBody = StyleSheet.create({
+    bodyContent: {
+        marginLeft: '10%',
+        marginRight: '10%',
+        marginTop: '3%',
+    },
+    buttonRow: {
+        alignItems: 'center',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginBottom: '5%',
+        width: '100%',
+    },
+    descriptionColumn: {
+        width: '100%',
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+    },
+    horizontalLine: {
+        borderBottomColor: '#D8D8D8',
+        borderBottomWidth: 1,
+        marginBottom: '3%',
+        marginTop: '3%',
+    },
+    refundText: {
+        color: '#7B7B7B',
+        fontSize: 12,
+        marginBottom: '3%',
+        fontFamily: fontMed
+    },
+    row: {
+        flexDirection: 'column',
+        width: '80%',
+        justifyContent: 'space-around',
+        alignItems:'flex-start'
+    },
+    titleColumn: {
+        width: '100%'
+       // flexDirection: 'column',
+    },
+    button: {
+        alignItems: 'center',
+        backgroundColor: '#24988D',
+        borderRadius: 32,
+        justifyContent: 'center',
+        minHeight: 50,
+        width: '40%',
     },
     buttonText: {
-        color: '#fff',
-        fontFamily: fontSemiBold
+        color: '#FFFFFF',
+        fontSize: 18,
+        fontFamily: fontBold
     },
+    titleText: {
+        fontFamily: fontBold,
+        lineHeight:hp('3%')
+        // textAlign:'justify'
+    },
+    bodyText: {
+        fontFamily: fontReg,
+      //  textAlign: 'right'
+    }
 })

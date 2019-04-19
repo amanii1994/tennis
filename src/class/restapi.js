@@ -10,6 +10,7 @@ export default restapi = {
             for (let x in data) {
                 postData.append(x, data[x]);
             }
+            console.log(postData);
             fetch(url, {
                 method: 'POST',
                 headers: {
@@ -18,7 +19,7 @@ export default restapi = {
                 },
                 body: postData,
             }).then((res) => {
-              //  console.log(res);
+                console.log(res);
                 resolve(res.json());
             }).catch((err) => {
                 reject(err);
@@ -29,6 +30,7 @@ export default restapi = {
     get: function (url) {
         return new Promise((resolve, reject) => {
             fetch(url).then((res) => {
+                console.log(res);
                 resolve(res.json());
             }).catch((err) => {
                 reject(err);
@@ -50,6 +52,12 @@ export default restapi = {
     },
     async saveAppoint(data) {
         let url = Constants.API_URL + 'object=app&action=createAppoint';
+        let res = await this.post(url, data);
+        return res; 
+    },
+    async saveAppointGuest(data) {
+        console.log(data);
+        let url = Constants.API_URL + 'object=app&action=createAppointGuest';
         let res = await this.post(url, data);
         return res; 
     }

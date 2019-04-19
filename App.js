@@ -6,6 +6,7 @@ import Welcome from './src/welcome';
 import Login from './src/login';
 import Signupa from './src/signupa';
 import Signupb from './src/signupb';
+import Signupfb from './src/signupfb';
 import Password from './src/password';
 import Rpassword from './src/forgot';
 import Home from './src/home';
@@ -39,7 +40,8 @@ import Termc from './src/term&conditions';
 import Giftcard from './src/giftcard';
 import Filter from './src/filter';
 import HomeCourtD from './src/homeCourtD';
-import Check1 from './src/check1';
+import Guestcheckout from './src/guestcheckout';
+//import Check1 from './src/check1';
 const AppStack = createStackNavigator({ 
   stack: { screen: StackNav, navigationOptions: { header: null } },
   home: { screen: Home, navigationOptions: { header: null } },
@@ -71,15 +73,21 @@ const AppStack = createStackNavigator({
   termc: {screen:Termc,navigationOptions: { header: null }},
   giftcard: {screen:Giftcard,navigationOptions: { header: null }},
   filter: {screen: Filter,navigationOptions: { header: null }},
-  check1: {screen: Check1,navigationOptions: { header: null }}
- });
+  guestcheckout: {screen: Guestcheckout, navigationOptions: { header : null}}
+  //check1: {screen: Check1,navigationOptions: { header: null }}
+ },{
+  initialRouteName: 'stack'
+});
 const AuthStack = createStackNavigator({ 
   welcome: { screen: Welcome, navigationOptions: { header: null } },
   login :{screen:Login,navigationOptions: {header: null }},
   signupa:{screen:Signupa, navigationOptions:{header:null}},
   signupb:{screen:Signupb, navigationOptions:{header:null}},
+  signupfb: {screen: Signupfb,navigationOptions: { header: null }},
   password:{screen:Password, navigationOptions:{header:null}},
   forgot:{screen:Rpassword, navigationOptions:{header:null}}, 
+},{
+  initialRouteName: 'welcome'
 });
 
 export default createAppContainer(createSwitchNavigator(
@@ -96,5 +104,19 @@ export default createAppContainer(createSwitchNavigator(
 const styles = StyleSheet.create({
  
 });
+// import {
+//   createSwitchNavigator,
+//   createAppContainer,
+// } from 'react-navigation';
+// import HomeScreen from './app/screens/HomeScreen';
 
+// const RootStack = createSwitchNavigator({
+//   Home: { screen: HomeScreen },
+// }, {
+//   initialRouteName: 'Home',
+// });
+
+// const App = createAppContainer(RootStack);
+
+// export default App;
 

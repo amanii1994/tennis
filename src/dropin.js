@@ -22,22 +22,27 @@ export default class dropin extends Component {
             product_id:0,
             activity_id:'',
             price: '',
-            quantity:1
+            quantity:1,
+            time_detail:'',
         };
     }
-    setActive(key,price) {
+    setActive(key,price,time) {
         this.setState({
             product_id: key,
-            price: price
+            price: price,
+            time_detail: time
         });
     }
     goNext(){
         if(this.state.quantity && this.state.price){
             this.props.navigation.navigate('dropinA', {
                 activity_id: this.state.activity_id,
+                activity_name: this.state.activity.activity_name,
                 product_id: this.state.product_id,
                 price: this.state.price,
-                quantity: this.state.quantity
+                quantity: this.state.quantity,
+                time_detail: this.state.time_detail,
+                total_price: this.state.quantity * this.state.price
             })
         }else{
             Alert.alert('Please select Price and duration!');
@@ -97,7 +102,7 @@ export default class dropin extends Component {
                     <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                         {this.state.products ? this.state.products.map((data) => {
                             return (
-                                <TouchableOpacity style={[styles.containerC, { backgroundColor: this.state.product_id == data.id ? '#1AB31A' : 'transparent', borderColor: this.state.product_id == data.id ? '#1AB31A' : '#000' }]} key={data.id} onPress={() => this.setActive(data.id,data.price)}>
+                                <TouchableOpacity style={[styles.containerC, { backgroundColor: this.state.product_id == data.id ? '#1AB31A' : 'transparent', borderColor: this.state.product_id == data.id ? '#1AB31A' : '#000' }]} key={data.id} onPress={() => this.setActive(data.id,data.price,data.time_detail)}>
                                     <Text style={[styles.textP, { color: this.state.product_id == data.id ? '#fff' : '#000' }]}>{data.time_detail}</Text>
                                     <Text style={[styles.textP1, { color: this.state.product_id == data.id ? '#fff' : '#000' }]}>$ {data.price}</Text>
                                 </TouchableOpacity>

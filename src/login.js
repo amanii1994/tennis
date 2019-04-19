@@ -30,6 +30,16 @@ export default class login extends Component {
             signedIn: false, name: "", photoUrl: ""
         }
     }
+    guestLogin(){
+        AsyncStorage.setItem("userToken", "authData");
+        AsyncStorage.setItem("userType", "guest");
+        let resData = restapi.get(Constants.API_URL + 'object=app&action=getStaticData');
+        resData.then((res) => {
+            AsyncStorage.setItem('appData', JSON.stringify(res.data));
+            Alert.alert('Successfully logged in!!');
+            this.props.navigation.navigate('App');
+        })
+    }
     async componentDidMount() {
         this._configureGoogleSignIn();
         await this._getCurrentUser();
@@ -126,6 +136,7 @@ export default class login extends Component {
     }
     _saveUser(userData){
         AsyncStorage.setItem("userToken", "authData");
+        AsyncStorage.setItem("userType", "user");
         AsyncStorage.setItem("authData", JSON.stringify(userData));
         let resData = restapi.get(Constants.API_URL + 'object=app&action=getStaticData');
         resData.then((res) => {
@@ -145,7 +156,11 @@ export default class login extends Component {
                 let res = restapi.post(apiUrl + 'socialLogin', userInfo.user);
                 res.then(res => {
                     if (res.status == 'success') {
-                        this._saveUser(res.data);
+                        if(res.data.mobile){
+                            this._saveUser(res.data);
+                        }else{
+                            this.props.navigation.navigate('signupfb',{uData: res.data});
+                        } 
                     } else {
                         Alert.alert(res.msg);
                     }
@@ -156,7 +171,7 @@ export default class login extends Component {
                         }
                 });
             }else{
-                Alert.alert('Invalid User!1');
+                Alert.alert('Invalid User!');
             }
         } catch (error) {
             if (error.code === statusCodes.SIGN_IN_CANCELLED) {
@@ -304,7 +319,13 @@ export default class login extends Component {
                             </TouchableOpacity>
                         </View>
                         <View style={{ alignSelf: 'center' }}>
-                            <Button buttonStyle={[styles.buttonstyle]} title='Continue as Guest' titleStyle={[styles.buttonText,]} />
+                            <TouchableOpacity style={[styles.touchStyle, { marginTop: hp('1.5%') }]} onPress={() => this.guestLogin()}>
+                                <View style={{ flexDirection: 'row', }}>
+                                    <View style={{ alignSelf: 'center' }}>
+                                        <Text style={styles.touchText}>Continue as Guest</Text>
+                                    </View>
+                                </View>
+                            </TouchableOpacity>
                             <TouchableOpacity style={[styles.touchStyle, { marginTop: hp('1.5%') }]}>
                                 <View style={{ flexDirection: 'row', }}>
                                     <View style={{ alignSelf: 'center' }}>
