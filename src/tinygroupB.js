@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text,TouchableHighlight, StyleSheet,AsyncStorage, Platform, Image, TouchableOpacity, Alert, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { View, Text,TouchableHighlight, ScrollView,StyleSheet,AsyncStorage, Platform, Image, TouchableOpacity, Alert, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import StatusBar from './statusBar';
 import { createIconSetFromIcoMoon } from 'react-native-vector-icons';
@@ -179,6 +179,11 @@ export default class tinygroupB extends Component {
             this.setState({ showingDigitalWallet: false });
         }
     }
+    readerData(){
+        this.setState({ showingBottomSheet: false });   
+        AsyncStorage.setItem('itemReader', JSON.stringify(this.state.saveData));
+        this.props.navigation.navigate('reader');      
+    }
 
     render() {
         const { navigate } = this.props.navigation;
@@ -186,37 +191,37 @@ export default class tinygroupB extends Component {
             <View style={{ backgroundColor: '#fff', width: '100%', height: '100%', flex: 1 }}>
                 <StatusBar backgroundColor="#282828" barStyle="light-content" />
                 <View style={styles.container}>
-                    <TouchableOpacity style={{ alignSelf: 'center', marginLeft: wp('3%'), }} onPress={() => navigate('tinygroupA')}><Linericon name="left-arrow-1" size={wp('4.5%')} color='#000000' /></TouchableOpacity>
+                    <TouchableOpacity style={{ alignSelf: 'center', marginLeft: wp('3%'), }} onPress={() => navigate('tinygroupA')}><Linericon name="left-arrow-1" size={wp('7.5%')} color='#000000' /></TouchableOpacity>
                     <View style={{ flex: 6, justifyContent: 'center' }}><Text style={[styles.headerText, { fontSize: wp('5'), fontFamily: fontMed }]}>Confirmation</Text></View>
                 </View>
 
                 <View style={{ flexDirection: 'row', alignSelf: 'center', justifyContent: 'space-around', marginTop: wp('6%') }}>
-                    <View style={[styles.containerC, { padding: wp('2%') }]}>
-                        <View style={{ width: wp('20%'), justifyContent: 'space-around' }}>
+                    <View style={[styles.containerC, {  }]}>
+                        {/* <View style={{ width: wp('20%'), justifyContent: 'space-around' }}>
                             <Text style={[styles.textcontainerC, { marginLeft: wp('2%') }]}> Where  </Text>
-                        </View>
-                        <View style={{ width: wp('80%'), justifyContent: 'space-around' }}>
-                            <Text style={[styles.textcontainerC, { alignItems: 'flex-start' }]}> {this.state.saveData.loc_name}</Text>
+                        </View> */}
+                        <View style={{ width: wp('95%'), justifyContent: 'space-around' }}>
+                            <Text style={[styles.textcontainerC, { alignItems: 'flex-start',marginLeft: wp('5%')  }]}> {this.state.saveData.loc_name}</Text>
                         </View>
                     </View>
                 </View>
                 <View style={{ flexDirection: 'row', alignSelf: 'center', justifyContent: 'space-around', marginTop: wp('3%') }}>
-                    <View style={[styles.containerC, { padding: wp('2%') }]}>
-                        <View style={{ width: wp('20%'), justifyContent: 'space-around' }}>
+                    <View style={[styles.containerC, { }]}>
+                        {/* <View style={{ width: wp('20%'), justifyContent: 'space-around' }}>
                             <Text style={[styles.textcontainerC, { marginLeft: wp('2%') }]}> Time  </Text>
-                        </View>
-                        <View style={{ width: wp('80%'), justifyContent: 'space-around' }}>
-                            <Text style={[styles.textcontainerC, { alignItems: 'flex-start' }]}>  {this.state.saveData.session_name}</Text>
+                        </View> */}
+                        <View style={{ width: wp('95%'), justifyContent: 'space-around' }}>
+                            <Text style={[styles.textcontainerC, { alignItems: 'flex-start',marginLeft: wp('5%')  }]}>  {this.state.saveData.session_name}</Text>
                         </View>
                     </View>
                 </View>
                 <View style={{ flexDirection: 'row', alignSelf: 'center', marginTop: wp('3%') }}>
-                    <View style={[styles.containerC, { padding: wp('1%') }]}>
-                        <View style={{ width: wp('20%'), justifyContent: 'space-around' }}>
+                    <View style={[styles.containerC, {  }]}>
+                        {/* <View style={{ width: wp('20%'), justifyContent: 'space-around' }}>
                             <Text style={[styles.textcontainerC, { marginLeft: wp('2%') }]}> Date  </Text>
-                        </View>
-                        <View style={{ width: wp('80%'), justifyContent: 'space-around' }}>
-                            <Text style={[styles.textcontainerC, { alignItems: 'flex-start' }]}>  {this.state.saveData.app_date}</Text>
+                        </View> */}
+                        <View style={{ width: wp('95%'), justifyContent: 'space-around' }}>
+                            <Text style={[styles.textcontainerC, { alignItems: 'flex-start',marginLeft: wp('5%')  }]}>  {this.state.saveData.app_date}</Text>
                         </View>
                     </View>
                 </View>
@@ -252,6 +257,7 @@ export default class tinygroupB extends Component {
                             <Text style={stylesTitle.title}>Order Information</Text>
                         </View>
                         <View style={stylesBody.bodyContent}>
+                        <ScrollView>
                             <View style={stylesBody.row}>
                                 <View style={stylesBody.titleColumn}>
                                     <Text style={stylesBody.titleText}>Contact Information</Text>
@@ -327,15 +333,27 @@ export default class tinygroupB extends Component {
                             </View>
                             <View style={stylesBody.horizontalLine} />
                             <Text style={stylesBody.refundText}>
-                                You can refund this transaction through your Square dashboard,
-                                go to squareup.com/dashboard.
+                              
                             </Text>
+                            </ScrollView>
                         </View>
                         <View style={stylesBody.buttonRow}>
+                        <TouchableOpacity onPress={this.onShowCardEntry} style={[stylesBody.button,{backgroundColor:'#000'}]}>    
+                            <View style={styles.imgContainer}>
+                                    <Image source={require('../src/img/card.png')} style={{flex: 1, height: undefined,
+    width: undefined}}/>
+                                </View>
+                                <Text style={stylesBody.buttonText}>Pay</Text>
+                            </TouchableOpacity>
                             <TouchableOpacity
-                                onPress={this.onShowCardEntry}
+                                onPress={() => this.readerData()}
                                 style={stylesBody.button}
                             >
+                                <View style={styles.imgContainer}>
+                                    <Image source={require('../src/img/square.png')} style={{flex: 1, height: undefined,
+    width: undefined}}/>
+                                </View>
+                                
                                 <Text style={stylesBody.buttonText}>Pay</Text>
                             </TouchableOpacity>
                         </View>
@@ -351,6 +369,12 @@ const styles = StyleSheet.create({
         marginTop: hp('1%'),
         flexDirection: 'row',
     },
+    imgContainer: {
+        width: wp('6%'), height: wp('6.2%'),
+        marginRight: wp('2%'),
+       // backgroundColor:'#24988D'
+        //alignSelf: 'center',
+      },
     headerText: {
         fontSize: wp('5%'),
         color: '#000000',
@@ -440,15 +464,14 @@ const stylesTitle = StyleSheet.create({
 })
 const stylesBody = StyleSheet.create({
     bodyContent: {
-        marginLeft: '10%',
-        marginRight: '10%',
-        marginTop: '3%',
+        margin: wp('8%'),
+        height:hp('40%')
     },
     buttonRow: {
         alignItems: 'center',
         flexDirection: 'row',
         justifyContent: 'center',
-        marginBottom: '5%',
+        marginBottom: hp('8%'),
         width: '100%',
     },
     descriptionColumn: {
@@ -475,7 +498,7 @@ const stylesBody = StyleSheet.create({
         alignItems:'flex-start'
     },
     titleColumn: {
-        width: '100%'
+        width: wp('100%')
        // flexDirection: 'column',
     },
     button: {
@@ -485,6 +508,7 @@ const stylesBody = StyleSheet.create({
         justifyContent: 'center',
         minHeight: 50,
         width: '40%',
+        flexDirection:'row'
     },
     buttonText: {
         color: '#FFFFFF',
@@ -501,3 +525,4 @@ const stylesBody = StyleSheet.create({
       //  textAlign: 'right'
     }
 })
+

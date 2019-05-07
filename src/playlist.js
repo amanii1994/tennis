@@ -5,6 +5,7 @@ import StatusBar from './statusBar';
 import { createIconSetFromIcoMoon } from 'react-native-vector-icons';
 import icoMoonConfig from '../selection.json';
 import { Button } from 'react-native-elements';
+import SpotifyPlayer from 'react-spotify-player';
 const Linericon = createIconSetFromIcoMoon(icoMoonConfig, 'icomoon', 'icomoon.ttf');
 const fontReg = (Platform.OS === 'ios') ? 'Montserrat-Regular' : 'Montserrat-Regular';
 const fontMed = (Platform.OS === 'ios') ? 'Montserrat-Medium' : 'Montserrat-Medium';
@@ -20,7 +21,7 @@ export default class playlist extends Component {
                     <View style={{ width: wp('100%'), height: hp('16%'), backgroundColor: '#fff' }}>
                         <Image source={require('./img/playlist.png')} style={{ flex: 1, height: undefined, width: undefined, }} resizeMode="cover" />
                     </View>
-                    <Linericon name="left-arrow-1" size={wp('6%')} color='#fff' style={{ position: 'absolute', top: 0, left: 0, margin: wp('3%') }} onPress={() => navigate('home')} />
+                    <Linericon name="left-arrow-1" size={wp('7.5%')} color='#fff' style={{ position: 'absolute', top: 0, left: 0, margin: wp('3%') }} onPress={() => navigate('home')} />
                 </View>
                 <ScrollView>
                     <View style={[styles.textContainer,{marginTop:wp('3%')}]}>
@@ -47,6 +48,12 @@ export default class playlist extends Component {
                         <View style={styles.imgContainer}>
                             <Image source={require('./img/imgp3.png')} style={{ flex: 1, height: undefined, width: undefined, }} resizeMode="cover" />
                         </View>
+                        <SpotifyPlayer
+  uri="spotify:album:1TIUsv8qmYLpBEhvmBmyBk"
+  size={'100%'}
+  view={'list'}
+  theme={'black'}
+/>
                     </View>
                     </View>
                 </ScrollView>

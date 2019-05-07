@@ -22,7 +22,7 @@ export default class referFrnd extends Component {
                              alignSelf: 'center', 
                             marginLeft: wp('3%'), 
                             }} onPress={() => navigate('home')}>
-                            <Linericon name="left-arrow-1" size={wp('5%')} color='#000000' />
+                            <Linericon name="left-arrow-1" size={wp('7.5%')} color='#000000' />
                         </TouchableOpacity>
                         <View style={{ flex: 6, justifyContent: 'center' }}><Text style={[styles.headerText, { fontSize: wp('5'),marginRight:wp('3%'),fontFamily:fontMed }]}>Refer a Friend</Text></View>
                     </View>

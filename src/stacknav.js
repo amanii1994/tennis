@@ -18,6 +18,9 @@ import Music from './music';
 import PrivacyPolicy from './privacyPolicy';
 import Termc from './term&conditions';
 import Giftcard from './giftcard';
+import dropinRewardA from './dropinRewardA';
+import rewardActivity from './rewardActivity';
+import Reward from './reward';
 
 const HomeNavigator = createStackNavigator({
     home: { screen: Home,navigationOptions: { header: null } },
@@ -31,11 +34,14 @@ const HomeNavigator = createStackNavigator({
     tinyClass:{screen:TinyClass, navigationOptions: { header: null }},
     referFrnd:{screen:ReferFrnd, navigationOptions: { header: null }},
     livestream:{screen:Livestream, navigationOptions: { header: null }},
+    reward:{screen:Reward,navigationOptions: { header: null }},
     // playlist:{screen:Playlist},
     Music:{screen:Music,navigationOptions: { header: null }},
     privacypolicy:{screen:PrivacyPolicy,navigationOptions: { header: null }},
     termC:{screen:Termc,navigationOptions: { header: null }},
     giftcard:{screen: Giftcard,navigationOptions: { header: null }},
+    dropinRewardA:{screen: dropinRewardA,navigationOptions: { header: null }},
+    rewardActivity:{screen: rewardActivity,navigationOptions: { header: null }},
 }, {});
 
 const HomeNavigationDrawer = createDrawerNavigator({

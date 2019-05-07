@@ -68,26 +68,26 @@ export default class dropinA extends Component {
     checkout() {
         AsyncStorage.getItem("userType").then((info) => {
             if (info) {
-               if(info == 'guest'){
-                let saveData = {
-                    'activity_name': this.props.navigation.getParam('activity_name'),
-                    'activity_id':this.props.navigation.getParam('activity_id'),
-                    'quantity':this.props.navigation.getParam('quantity'),
-                    'price':this.props.navigation.getParam('price'),
-                    'location_id':this.state.selectedLoc,
-                    'loc_name':this.state.selectedName,
-                    'app_date':moment(this.state.selectedDate).format('YYYY-MM-DD'),
-                    'time_detail':this.props.navigation.getParam('time_detail'),
-                    'product_id' :this.props.navigation.getParam('product_id'),
-                    'total_price': this.props.navigation.getParam('total_price'),
-                    'session_id' : 0,
-                };
-                this.props.navigation.navigate('guestcheckout',{'saveData': saveData});
-               }else{
-                this.showOrderScreen();
-               }
+                if (info == 'guest') {
+                    let saveData = {
+                        'activity_name': this.props.navigation.getParam('activity_name'),
+                        'activity_id': this.props.navigation.getParam('activity_id'),
+                        'quantity': this.props.navigation.getParam('quantity'),
+                        'price': this.props.navigation.getParam('price'),
+                        'location_id': this.state.selectedLoc,
+                        'loc_name': this.state.selectedName,
+                        'app_date': moment(this.state.selectedDate).format('YYYY-MM-DD'),
+                        'time_detail': this.props.navigation.getParam('time_detail'),
+                        'product_id': this.props.navigation.getParam('product_id'),
+                        'total_price': this.props.navigation.getParam('total_price'),
+                        'session_id': 0,
+                    };
+                    this.props.navigation.navigate('guestcheckout', { 'saveData': saveData });
+                } else {                 
+                        this.showOrderScreen();                     
+                }
             }
-        }); 
+        });
     }
     async onCardNonceRequestSuccess(cardDetails) {
         if (this.chargeServerHostIsSet()) {
@@ -114,6 +114,7 @@ export default class dropinA extends Component {
                                     'total_price': this.props.navigation.getParam('total_price'),
                                     't_id': res.id
                                 };
+                                
                             let p = Rest.saveAppoint(this.data);
                         })
                         SQIPCardEntry.completeCardEntry(() => {
@@ -145,7 +146,7 @@ export default class dropinA extends Component {
             });
         }
     }
-    
+
     checkStateAndPerform() {
         if (this.state.showingCardEntry) {
             // if application id is not set, we will let you know where to set it,
@@ -162,6 +163,30 @@ export default class dropinA extends Component {
             this.setState({ showingDigitalWallet: false });
         }
     }
+    readerData(){
+        this.setState({ showingBottomSheet: false });
+        Rest.getCurrentUser('authData').then((uData) => {
+            if (uData != null){
+                let saveData = {
+                    'activity_name': this.props.navigation.getParam('activity_name'),
+                    'activity_id': this.props.navigation.getParam('activity_id'),
+                    'quantity': this.props.navigation.getParam('quantity'),
+                    'price': this.props.navigation.getParam('price'),
+                    'location_id': this.state.selectedLoc,
+                    'loc_name': this.state.selectedName,
+                    'app_date': moment(this.state.selectedDate).format('YYYY-MM-DD'),
+                    'time_detail': this.props.navigation.getParam('time_detail'),
+                    'product_id': this.props.navigation.getParam('product_id'),
+                    'total_price': this.props.navigation.getParam('total_price'),
+                    'session_id': 0,
+                    'user_id':uData.id
+                };
+                AsyncStorage.setItem('itemReader', JSON.stringify(saveData));
+                this.props.navigation.navigate('reader');
+            }
+        })
+    }
+    
 
     async startCardEntry() {
         this.setState({ showingCardEntry: false });
@@ -225,7 +250,7 @@ export default class dropinA extends Component {
         //   canUseDigitalWallet: digitalWalletEnabled,
         // });
     }
-   
+
     componentWillUnmount() {
         this._isMounted = false;
     }
@@ -246,7 +271,7 @@ export default class dropinA extends Component {
                 <Loader
                     loading={this.state.loading} />
                 <View style={styles.container}>
-                    <TouchableOpacity style={{ alignSelf: 'center', marginLeft: wp('3%'), }} onPress={() => navigate('dropin')}><Linericon name="left-arrow-1" size={wp('4.5%')} color='#000000' /></TouchableOpacity>
+                    <TouchableOpacity style={{ alignSelf: 'center', marginLeft: wp('3%'), }} onPress={() => navigate('dropin')}><Linericon name="left-arrow-1" size={wp('7.5%')} color='#000000' /></TouchableOpacity>
                     <View style={{ flex: 6, justifyContent: 'center' }}><Text style={[styles.headerText, { fontSize: wp('5'), fontFamily: fontMed }]}>Calendar</Text></View>
                 </View>
                 <View style={{ width: wp('60%'), marginLeft: wp('1%') }}>
@@ -277,6 +302,7 @@ export default class dropinA extends Component {
                             disabledDateNumberStyle={{ color: 'grey' }}
                             onWeekChanged={(value) => this._updateWeek(value)}
                             updateWeek={false}
+                            minDate={moment()}
                             selectedDate={this.state.selectedDate}
                             iconContainer={{ flex: 0.1 }}
                         />
@@ -315,12 +341,13 @@ export default class dropinA extends Component {
                             <Text style={stylesTitle.title}>Order Information</Text>
                         </View>
                         <View style={stylesBody.bodyContent}>
-                            <View style={stylesBody.row}>       
-                                    <Text style={stylesBody.titleText}>Contact Information</Text>
+                        <ScrollView>
+                            <View style={stylesBody.row}>
+                                <Text style={stylesBody.titleText}>Contact Information</Text>
                             </View>
                             <View style={stylesBody.descriptionColumn}>
-                                    <Text style={stylesBody.bodyText}>{this.state.userData.user_name}</Text>
-                                    <Text style={stylesBody.bodyText}>{this.state.userData.mobile}</Text>                 
+                                <Text style={stylesBody.bodyText}>{this.state.userData.user_name}</Text>
+                                <Text style={stylesBody.bodyText}>{this.state.userData.mobile}</Text>
                             </View>
                             <View style={stylesBody.horizontalLine} />
                             <View style={stylesBody.row}>
@@ -379,15 +406,26 @@ export default class dropinA extends Component {
                             </View>
                             <View style={stylesBody.horizontalLine} />
                             <Text style={stylesBody.refundText}>
-                                You can refund this transaction through your Square dashboard,
-                                go to squareup.com/dashboard.
                             </Text>
+                        </ScrollView>
                         </View>
                         <View style={stylesBody.buttonRow}>
+                            <TouchableOpacity onPress={this.onShowCardEntry} style={[stylesBody.button,{backgroundColor:'#000'}]}>    
+                            <View style={styles.imgContainer}>
+                                    <Image source={require('../src/img/card.png')} style={{flex: 1, height: undefined,
+    width: undefined}}/>
+                                </View>
+                                <Text style={stylesBody.buttonText}>Pay</Text>
+                            </TouchableOpacity>
                             <TouchableOpacity
-                                onPress={this.onShowCardEntry}
+                                onPress={() => this.readerData()}
                                 style={stylesBody.button}
                             >
+                                <View style={styles.imgContainer}>
+                                    <Image source={require('../src/img/square.png')} style={{flex: 1, height: undefined,
+    width: undefined}}/>
+                                </View>
+                                
                                 <Text style={stylesBody.buttonText}>Pay</Text>
                             </TouchableOpacity>
                         </View>
@@ -408,6 +446,12 @@ const styles = StyleSheet.create({
         fontFamily: fontBold,
         alignSelf: 'center',
     },
+    imgContainer: {
+        width: wp('6%'), height: wp('6.2%'),
+        marginRight: wp('2%'),
+       // backgroundColor:'#24988D'
+        //alignSelf: 'center',
+      },
     containerB: {
         width: wp('40%'),
         alignSelf: 'center',
@@ -521,15 +565,14 @@ const stylesTitle = StyleSheet.create({
 })
 const stylesBody = StyleSheet.create({
     bodyContent: {
-        marginLeft: '10%',
-        marginRight: '10%',
-        marginTop: '3%',
+        margin: wp('8%'),
+        height:hp('40%')
     },
     buttonRow: {
         alignItems: 'center',
         flexDirection: 'row',
         justifyContent: 'center',
-        marginBottom: '5%',
+        marginBottom: hp('8%'),
         width: '100%',
     },
     descriptionColumn: {
@@ -556,7 +599,7 @@ const stylesBody = StyleSheet.create({
         alignItems:'flex-start'
     },
     titleColumn: {
-        width: '100%'
+        width: wp('100%')
        // flexDirection: 'column',
     },
     button: {
@@ -566,6 +609,7 @@ const stylesBody = StyleSheet.create({
         justifyContent: 'center',
         minHeight: 50,
         width: '40%',
+        flexDirection:'row'
     },
     buttonText: {
         color: '#FFFFFF',

@@ -27,7 +27,7 @@ export default class forgot extends Component {
         var error;
         if (text) {
             let reg = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i;
-            if (reg.test(text) == false) {
+            if (reg.test(text.trim()) == false) {
                 error = 2;
                 this.setState({ emailError: 'please enter correct email!!' });
             } else {
@@ -43,7 +43,7 @@ export default class forgot extends Component {
     handleSubmit = () => {
         this.setState({ loading: true });
         var formStatus = '';
-        formStatus += this.validateEmail(this.state.email)
+        formStatus += this.validateEmail(this.state.email);
         if (formStatus.length > 0) {
             this.setState({ loading: false });
             return false;
@@ -53,7 +53,7 @@ export default class forgot extends Component {
                 headers: new Headers({
                     'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
                 }),
-                body: 'email=' + this.state.email
+                body: 'email=' + this.state.email.trim()
             }).then((response) => response.json())
                 .then((responseJson) => {
                     console.log(responseJson);

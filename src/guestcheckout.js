@@ -81,8 +81,9 @@ export default class guestcheckout extends Component {
                                     'first_name' : this.state.fname,
                                     'last_name' : this.state.lname,
                                     'session_id': this.state.saveData.session_id,
-                                    'email' : this.state.email,
+                                    'email' : this.state.email.trim(),
                                     'phone': this.state.phone,
+                                    'zip_code' : this.state.zip_code,
                                     'total_price': this.state.saveData.total_price,
                                     't_id': res.id
                                 };       
@@ -90,8 +91,7 @@ export default class guestcheckout extends Component {
                         SQIPCardEntry.completeCardEntry(() => {
                             showAlert('Your order was successful',
                                 'Go to your Square dashbord to see this order reflected in the sales tab.');
-                                AsyncStorage.clear();
-                                this.props.navigation.navigate('Auth');
+                                this.props.navigation.navigate('home');
                         });
                     } else {
                         Alert.alert(res.msg);
@@ -224,7 +224,7 @@ export default class guestcheckout extends Component {
         var error;
         if (text) {
             let reg = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i;
-            if (reg.test(text) === false) {
+            if (reg.test(text.trim()) === false) {
                 error = 2;
                 this.setState({ emailError: 'please enter correct email!!' });
             } else {
@@ -254,6 +254,28 @@ export default class guestcheckout extends Component {
         }
         return error;
     }
+    
+    readerData(){
+        this.setState({ showingBottomSheet: false });
+        this.data = {
+            'user_id': 0,
+            'activity_id': this.state.saveData.activity_id,
+            'quantity': this.state.saveData.quantity,
+            'product_id': this.state.saveData.product_id,
+            'price': this.state.saveData.price,
+            'app_date': this.state.saveData.app_date,
+            'location_id': this.state.saveData.location_id,
+            'first_name' : this.state.fname,
+            'last_name' : this.state.lname,
+            'session_id': this.state.saveData.session_id,
+            'email' : this.state.email.trim(),
+            'phone': this.state.phone,
+            'zip_code' :this.state.zip_code,
+            'total_price': this.state.saveData.total_price,
+        };  
+        AsyncStorage.setItem('itemReader', JSON.stringify(this.data));
+        this.props.navigation.navigate('reader');  
+    }
    
     handleSubmit(){
         var formStatus = '';
@@ -276,18 +298,18 @@ export default class guestcheckout extends Component {
                 <Loader
                     loading={this.state.loading} />
                 <View style={styles.container}>
-                    <TouchableOpacity style={{ alignSelf: 'center', marginLeft: wp('3%'), }} onPress={() => this.props.navigation.goBack(null)}><Linericon name="left-arrow-1" size={wp('4.5%')} color='#000000' /></TouchableOpacity>
+                    <TouchableOpacity style={{ alignSelf: 'center', marginLeft: wp('3%'), }} onPress={() => this.props.navigation.goBack(null)}><Linericon name="left-arrow-1" size={wp('7.5%')} color='#000000' /></TouchableOpacity>
                     <View style={{ flex: 6, justifyContent: 'center' }}><Text style={[styles.headerText, { fontSize: wp('5'), fontFamily: fontMed }]}>Details</Text></View>
                 </View>
                 <ScrollView>
                 <KeyboardAvoidingView style={{ flexDirection: 'column', alignSelf: 'center', justifyContent: 'space-around', marginTop:wp('6%') }}>
                         <View style={[styles.containerC, {  }]}>
-                        <View style={{ width: wp('30%'), justifyContent: 'space-around' }}>
+                        {/* <View style={{ width: wp('30%'), justifyContent: 'space-around' }}>
                                 <Text style={[styles.textcontainerC, { marginLeft: wp('2%') }]}> First Name  </Text>
-                            </View>
-                            <View style={{ width: wp('70%'), justifyContent: 'space-around' }}>
+                            </View> */}
+                            <View style={{ width: wp('95%'), justifyContent: 'space-around' }}>
                                 <TextInput 
-                                    style={[styles.textcontainerC, { alignItems: 'flex-start' }]} 
+                                    style={[styles.textcontainerC, { alignItems: 'flex-start' , marginLeft: wp('5%')}]} 
                                     placeholder='Enter First Name' 
                                     autoCapitalize='none'
                                     onChangeText={(text) => {this.setState({fname: text})}}
@@ -299,12 +321,12 @@ export default class guestcheckout extends Component {
                     
                     <KeyboardAvoidingView style={{ flexDirection: 'column', alignSelf: 'center', justifyContent: 'space-around', marginTop:wp('6%') }}>
                         <View style={[styles.containerC, {  }]}>
-                        <View style={{ width: wp('30%'), justifyContent: 'space-around' }}>
+                        {/* <View style={{ width: wp('30%'), justifyContent: 'space-around' }}>
                                 <Text style={[styles.textcontainerC, { marginLeft: wp('2%') }]}> Last Name  </Text>
-                            </View>
-                            <View style={{ width: wp('70%'), justifyContent: 'space-around' }}>
+                            </View> */}
+                            <View style={{ width: wp('95%'), justifyContent: 'space-around' }}>
                                 <TextInput 
-                                    style={[styles.textcontainerC, { alignItems: 'flex-start' }]} 
+                                    style={[styles.textcontainerC, { alignItems: 'flex-start', marginLeft: wp('5%') }]} 
                                     placeholder='Enter Last Name' 
                                     autoCapitalize='none'
                                     onChangeText={(text) => {this.setState({lname: text})}}
@@ -315,12 +337,12 @@ export default class guestcheckout extends Component {
                     </KeyboardAvoidingView>
                     <KeyboardAvoidingView style={{ flexDirection: 'column', alignSelf: 'center', justifyContent: 'space-around', marginTop:wp('6%') }}>
                         <View style={[styles.containerC, { }]}>
-                        <View style={{ width: wp('30%'), justifyContent: 'space-around' }}>
+                        {/* <View style={{ width: wp('30%'), justifyContent: 'space-around' }}>
                                 <Text style={[styles.textcontainerC, { marginLeft: wp('2%') }]}> Email  </Text>
-                            </View>
-                            <View style={{ width: wp('70%'), justifyContent: 'space-around' }}>
+                            </View> */}
+                            <View style={{ width: wp('95%'), justifyContent: 'space-around' }}>
                                 <TextInput 
-                                    style={[styles.textcontainerC, { alignItems: 'flex-start' }]} 
+                                    style={[styles.textcontainerC, { alignItems: 'flex-start', marginLeft: wp('5%') }]} 
                                     placeholder='Enter Email' 
                                     autoCapitalize='none'
                                     onChangeText={(text) => {this.setState({email: text})}}
@@ -331,12 +353,12 @@ export default class guestcheckout extends Component {
                     </KeyboardAvoidingView>
                     <KeyboardAvoidingView style={{ flexDirection: 'column', alignSelf: 'center', justifyContent: 'space-around', marginTop:wp('6%') }}>
                         <View style={[styles.containerC, {  }]}>
-                        <View style={{ width: wp('30%'), justifyContent: 'space-around' }}>
+                        {/* <View style={{ width: wp('30%'), justifyContent: 'space-around' }}>
                                 <Text style={[styles.textcontainerC, { marginLeft: wp('2%') }]}> Phone  </Text>
-                            </View>
-                            <View style={{ width: wp('70%'), justifyContent: 'space-around' }}>
+                            </View> */}
+                            <View style={{ width: wp('95%'), justifyContent: 'space-around' }}>
                                 <TextInput 
-                                    style={[styles.textcontainerC, { alignItems: 'flex-start' }]} 
+                                    style={[styles.textcontainerC, { alignItems: 'flex-start', marginLeft: wp('5%') }]} 
                                     placeholder='Enter Phone' 
                                     keyboardType={'phone-pad'}
                                     onChangeText={(text) => {this.setState({phone: text})}}
@@ -344,6 +366,21 @@ export default class guestcheckout extends Component {
                             </View>
                         </View>
                         <Text style={styles.errorText}>{this.state.phoneError}</Text>
+                    </KeyboardAvoidingView>
+                    <KeyboardAvoidingView style={{ flexDirection: 'column', alignSelf: 'center', justifyContent: 'space-around', marginTop:wp('6%') }}>
+                        <View style={[styles.containerC, {  }]}>
+                        {/* <View style={{ width: wp('30%'), justifyContent: 'space-around' }}>
+                                <Text style={[styles.textcontainerC, { marginLeft: wp('2%') }]}> Phone  </Text>
+                            </View> */}
+                            <View style={{ width: wp('95%'), justifyContent: 'space-around' }}>
+                                <TextInput 
+                                    style={[styles.textcontainerC, { alignItems: 'flex-start', marginLeft: wp('5%') }]} 
+                                    placeholder='Enter zip code' 
+                                    onChangeText={(text) => {this.setState({zip_code: text})}}
+                                    />
+                            </View>
+                        </View>
+                        {/* <Text style={styles.errorText}>{this.state.phoneError}</Text> */}
                     </KeyboardAvoidingView>
                     <View style={{ alignSelf: 'center' }}>
                         <Button
@@ -378,6 +415,7 @@ export default class guestcheckout extends Component {
                             <Text style={stylesTitle.title}>Order Information</Text>
                         </View>
                         <View style={stylesBody.bodyContent}>
+                        <ScrollView>
                             <View style={stylesBody.row}>       
                                     <Text style={stylesBody.titleText}>Contact Information</Text>
                             </View>
@@ -442,15 +480,27 @@ export default class guestcheckout extends Component {
                             </View>
                             <View style={stylesBody.horizontalLine} />
                             <Text style={stylesBody.refundText}>
-                                You can refund this transaction through your Square dashboard,
-                                go to squareup.com/dashboard.
+                              
                             </Text>
+                            </ScrollView>
                         </View>
                         <View style={stylesBody.buttonRow}>
+                        <TouchableOpacity onPress={this.onShowCardEntry} style={[stylesBody.button,{backgroundColor:'#000'}]}>    
+                            <View style={styles.imgContainer}>
+                                    <Image source={require('../src/img/card.png')} style={{flex: 1, height: undefined,
+    width: undefined}}/>
+                                </View>
+                                <Text style={stylesBody.buttonText}>Pay</Text>
+                            </TouchableOpacity>
                             <TouchableOpacity
-                                onPress={this.onShowCardEntry}
+                                onPress={() => this.readerData()}
                                 style={stylesBody.button}
                             >
+                                <View style={styles.imgContainer}>
+                                    <Image source={require('../src/img/square.png')} style={{flex: 1, height: undefined,
+    width: undefined}}/>
+                                </View>
+                                
                                 <Text style={stylesBody.buttonText}>Pay</Text>
                             </TouchableOpacity>
                         </View>
@@ -471,6 +521,12 @@ const styles = StyleSheet.create({
         fontFamily: fontBold,
         alignSelf: 'center',
     },
+    imgContainer: {
+        width: wp('6%'), height: wp('6.2%'),
+        marginRight: wp('2%'),
+       // backgroundColor:'#24988D'
+        //alignSelf: 'center',
+      },
     containerB: {
         width: wp('40%'),
         alignSelf: 'center',
@@ -496,7 +552,7 @@ const styles = StyleSheet.create({
     containerC:
     {
         width: wp('95%'),
-        height: hp('6%'),
+        height: hp('6.6%'),
         borderWidth: wp('0.3%'),
         flexDirection: 'row',
         borderColor: '#000000',
@@ -605,15 +661,14 @@ const stylesTitle = StyleSheet.create({
 })
 const stylesBody = StyleSheet.create({
     bodyContent: {
-        marginLeft: '10%',
-        marginRight: '10%',
-        marginTop: '3%',
+        margin: wp('8%'),
+        height:hp('40%')
     },
     buttonRow: {
         alignItems: 'center',
         flexDirection: 'row',
         justifyContent: 'center',
-        marginBottom: '5%',
+        marginBottom: hp('8%'),
         width: '100%',
     },
     descriptionColumn: {
@@ -640,7 +695,7 @@ const stylesBody = StyleSheet.create({
         alignItems:'flex-start'
     },
     titleColumn: {
-        width: '100%'
+        width: wp('100%')
        // flexDirection: 'column',
     },
     button: {
@@ -650,6 +705,7 @@ const stylesBody = StyleSheet.create({
         justifyContent: 'center',
         minHeight: 50,
         width: '40%',
+        flexDirection:'row'
     },
     buttonText: {
         color: '#FFFFFF',

@@ -11,6 +11,7 @@ const fontMed = (Platform.OS === 'ios') ? 'Montserrat-Medium' : 'Montserrat-Medi
 const fontSemiBold = (Platform.OS === 'ios') ? 'Montserrat-SemiBold' : 'Montserrat-SemiBold';
 const fontBold = (Platform.OS === 'ios') ? 'Montserrat-Bold' : 'Montserrat-Bold';
 import Constants from './constants';
+import restapi from './class/restapi';
 import Loader from './loader';
 //import { ScrollView } from 'react-native-gesture-handler';
 const apiUrl = Constants.WITHOUT_AUTH_API_URL;
@@ -103,33 +104,25 @@ export default class password extends Component {
                     dt.password = this.state.password;
                     AsyncStorage.setItem("userdata", JSON.stringify(dt));
                     //signup app
-                    fetch(apiUrl + 'signup', {
-                        method: 'POST',
-                        headers: new Headers({
-                            'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
-                        }),
-                        body: 'email=' + dt.email + '&password=' + this.state.password + '&fname=' + dt.firstName + '&lname=' + dt.lastName + '&zip_code=' + dt.zipCode + '&mobile=' + dt.phone
-                    }).then((response) => //{console.log(response)
-                        response.json())
-                        .then((responseJson) => {
-                            if (responseJson.status == 'success') {
-                                this.setState({ loading: false });
-                                AsyncStorage.clear();
-                                Alert.alert("","Account created.Please verify your email!!");
-                                this.props.navigation.navigate('login');
-                            } else {
-                                this.setState({ loading: false });
-                                Alert.alert(responseJson.msg);
-                            }
-                            console.log(responseJson);
-                        }).catch((error) => {
-                            this.setState({ loading: false });
-                            console.error(error);
-                            if (error == 'TypeError: Network request failed') {
-                                Alert.alert('Something went wrong', 'Kindly check if the device is connected to stable cellular data plan or WiFi.');
-                            }
-                        });
+                    let res = restapi.post(apiUrl + 'signup', { email: dt.email.trim(), password: this.state.password, fname: dt.firstName, lname: dt.lastName, zip_code: dt.zipCode, mobile: dt.phone });
+                    res.then(res => {
+                        console.log(res);
+                    if (res.status == 'success') {
+                        this.setState({ loading: false });
+                        AsyncStorage.clear();
+                        Alert.alert("","Account created.Please verify your email!!");
+                        this.props.navigation.navigate('login');
+                    } else {
+                        this.setState({ loading: false });
+                        Alert.alert(res.msg);
+                    }
+                    }).then(this.setState({ loading: false }))
+                    .catch(err => {
                     this.setState({ loading: false });
+                        if (err == 'TypeError: Network request failed') {
+                            Alert.alert('Something went wrong', 'Kindly check if the device is connected to stable cellular data plan or WiFi.');
+                        }
+                    });         
                 }
             });
         }
@@ -144,9 +137,9 @@ export default class password extends Component {
                         loading={this.state.loading} />
                     <ScrollView>
                     <View style={styles.container}>
-                        <Text style={[styles.headerS, { fontFamily: fontBold, color: 'black' }]}>Let's Keep in touch!</Text>
+                        <Text style={[styles.headerS, { fontFamily: fontBold, color: 'black' }]}>Tiny Protection!</Text>
                         <Text style={[styles.headerS, { fontSize: wp('4%'), fontFamily: fontSemiBold, color: '#828282' }]}>
-                            Tiny Tennis will text you when your child’sDrop In starts and ends.
+                            Create a password.
                         </Text>
                     </View>
                     <KeyboardAvoidingView style={styles.containerK} behavior="padding" enabled>
@@ -259,7 +252,7 @@ const styles = StyleSheet.create({
     },
     headerS: {
         textAlign: 'center',
-        fontSize: wp('12%'),
+        fontSize: wp('9%'),
     },
     buttonText: {
         color: '#fff',

@@ -114,7 +114,7 @@ export default class tinygroupA extends Component {
                 <View style={{ backgroundColor: '#fff', flex: 1 }}>
                     <StatusBar backgroundColor="#282828" barStyle="light-content" />
                     <View style={styles.container}>
-                        <TouchableOpacity style={{ alignSelf: 'center', marginLeft: wp('3%'), }} onPress={() => navigate('tinygroup')}><Linericon name="left-arrow-1" size={wp('4.5%')} color='#000000' /></TouchableOpacity>
+                        <TouchableOpacity style={{ alignSelf: 'center', marginLeft: wp('3%'), }} onPress={() => navigate('tinygroup')}><Linericon name="left-arrow-1" size={wp('7.5%')} color='#000000' /></TouchableOpacity>
                         <View style={{ flex: 6, justifyContent: 'center' }}><Text style={[styles.headerText, { fontSize: wp('5'), fontFamily: fontMed }]}>Calendar</Text></View>
                     </View>
                     <View style={{ width: wp('60%'), marginLeft: wp('1%') }}>
@@ -145,6 +145,7 @@ export default class tinygroupA extends Component {
                                 disabledDateNumberStyle={{ color: 'grey' }}
                                 onWeekChanged={(value) => this._updateWeek(value)}
                                 updateWeek={false}
+                                minDate={moment()}
                                 selectedDate={this.state.selectedDate}
                                 iconContainer={{ flex: 0.1 }}
                             />

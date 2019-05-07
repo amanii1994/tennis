@@ -111,7 +111,7 @@ export default class mommymeB extends Component {
                 <View style={{ backgroundColor: '#fff', flex: 1 }}>
                     <StatusBar backgroundColor="#282828" barStyle="light-content" />
                     <View style={styles.container}>
-                        <TouchableOpacity style={{ alignSelf: 'center', marginLeft: wp('3%'), }} onPress={() => navigate('mommymeA')}><Linericon name="left-arrow-1" size={wp('5%')} color='#000000' /></TouchableOpacity>
+                        <TouchableOpacity style={{ alignSelf: 'center', marginLeft: wp('3%'), }} onPress={() => navigate('mommymeA')}><Linericon name="left-arrow-1" size={wp('7.5%')} color='#000000' /></TouchableOpacity>
                         <View style={{ flex: 6, justifyContent: 'center' }}><Text style={[styles.headerText, { fontSize: wp('5'), fontFamily: fontMed }]}>Find a class</Text></View>
                     </View>
                     <View style={{ width: wp('60%'), marginLeft: wp('1%') }}>
@@ -138,6 +138,7 @@ export default class mommymeB extends Component {
                                 calendarHeaderStyle={{ color: 'black' }}
                                 dateNumberStyle={{ color: 'black' }}
                                 dateNameStyle={{ color: 'black' }}
+                                minDate={moment()}
                                 highlightDateNumberStyle={{ color: 'green' }}
                                 highlightDateNameStyle={{ color: 'green' }}
                                 disabledDateNameStyle={{ color: 'grey' }}

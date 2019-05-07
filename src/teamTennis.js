@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, TouchableWithoutFeedback, TouchableOpacity,Platform, Image, Keyboard,AsyncStorage } from 'react-native';
+import { View, StyleSheet, Text, TouchableWithoutFeedback,Alert, TouchableOpacity,Platform, Image, Keyboard,AsyncStorage } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { Button } from 'react-native-elements';
 import StatusBar from './statusBar';
@@ -17,9 +17,31 @@ export default class teamTennis extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            quantity: 1,
             activity: {},
-            products:{}
+            products: [],
+            color: '#000000',
+            bgColor: 'transparent',
+            boderColor: '#000000',
+            product_id: 0,
+            activity_id: '',
+            price: '',
         };
+    }
+    goNext() {
+        if (this.state.quantity && this.state.price) {
+            this.props.navigation.navigate('teamtennisA', {
+                itemId : this.props.navigation.getParam('itemId'),
+                activity_id: this.state.activity_id,
+                product_id: this.state.product_id,
+                price: this.state.price,
+                quantity: this.state.quantity,
+                activity_name: this.state.activity.activity_name,
+                total_price: this.state.price
+            })
+        } else {
+            Alert.alert('Please select Price!');
+        }
     }
     componentDidMount() {
         this._isMounted = true;
@@ -27,11 +49,28 @@ export default class teamTennis extends Component {
             AsyncStorage.getItem("appData").then((info) => {
                 if (info) {
                     let dt = JSON.parse(info);
+                    console.log(dt);
                     let itemId = this.props.navigation.getParam('itemId');
-                    this.setState({ activity: dt.activities[itemId]});
-                    this.setState({ products: dt.activities[itemId].products});
+                    this.setState({ activity: dt.activities[itemId], activity_id: dt.activities[itemId].id, products: dt.activities[itemId].products });
                 }
             });
+        }
+    }
+    setActive(id, price) {
+        this.setState({
+            color: '#fff',
+            bgColor: '#1AB31A',
+            boderColor: '#1AB31A',
+            product_id: id,
+            price: price,
+        });
+    }
+    incrementItem=()=>{
+            this.setState({quantity:this.state.quantity + 1});
+    }
+    decreaseItem=()=>{
+        if(this.state.quantity > 2){
+            this.setState({ quantity:this.state.quantity - 1});
         }
     }
     componentWillUnmount() {
@@ -49,7 +88,7 @@ export default class teamTennis extends Component {
                         <View style={{ width: wp('100%'), height: hp('23 %'), backgroundcolor: '' }}>
                                 <Image source={{uri:imgUrl+this.state.activity.image}} style={{ flex: 1, height: undefined, width: undefined, }} resizeMode="cover" />
                         </View>
-                        <Linericon name="left-arrow-1" size={wp('6%')} color='#000000' style={{ position: 'absolute', top: 0, left: 0, margin: wp('3%') }} onPress={()=> navigate('home')}/>
+                        <Linericon name="left-arrow-1" size={wp('7.5%')} color='#000000' style={{ position: 'absolute', top: 0, left: 0, margin: wp('3%') }} onPress={()=> navigate('home')}/>
                     </View>
                     <View style={{ flexDirection: 'row', margin: wp('4%') }}>
                         <Text style={styles.headerText}>{this.state.activity.activity_name}</Text>
@@ -65,8 +104,29 @@ export default class teamTennis extends Component {
                    
                     <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
                         <View style={[styles.containerC, {width:wp('86%')}]}>
-                            <Text style={[styles.textP, { alignSelf: 'center',fontSize:wp('4%'),fontFamily:fontSemiBold }]}> Coming Soon</Text>
-
+                            <Text style={[styles.textP, { alignSelf: 'center',fontSize:wp('4%'),fontFamily:fontSemiBold }]}> 09/09/2019-12/16/2019</Text>
+                        </View>
+                    </View>
+                    {this.state.products ? this.state.products.map((data) => {
+                            return (
+                                <TouchableOpacity style={[styles.containerC, { padding: wp('2%'), backgroundColor: this.state.bgColor, borderColor: this.state.boderColor, }]} key={data.id} onPress={() => { this.setActive(data.id,data.price) }}>
+                                    <Text style={[styles.headerText, { alignSelf: 'center', justifyContent: 'flex-start', flex: 1, fontSize: wp('4%'), fontFamily: fontReg, color: this.state.color }]}>{data.time_detail}</Text>
+                                    <Text style={[styles.textP1, { justifyContent: 'flex-end', color: this.state.color }]}>$ {data.price}</Text>
+                                </TouchableOpacity>
+                            )
+                    }) : ''}
+                     <View style={styles.containerD}>
+                        <Text style={[styles.headerText, { justifyContent: 'flex-start', flex: 1 }]}>Quantity</Text>
+                        <View style={{ justifyContent: 'flex-end' }}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+                            <TouchableOpacity style={styles.containerDa} onPress={this.decreaseItem} >
+                                    <Text style={{ alignSelf: 'center', fontSize: wp('5%') }}>-</Text>
+                                </TouchableOpacity>
+                                <Text style={[styles.textP]}>{this.state.quantity}</Text>
+                                <TouchableOpacity style={styles.containerDa} onPress={this.incrementItem} > 
+                                    <Text style={{ alignSelf: 'center', fontSize: wp('5%') }}>+</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
                     </View>
                     <View style={{ alignSelf: 'center' }}>
@@ -75,7 +135,7 @@ export default class teamTennis extends Component {
                             title='NEXT'
                             color='#fff'
                             titleStyle={styles.buttonText}
-                            // onPress={()=> navigate('mommymeB')}
+                            onPress={() => this.goNext()}
                         />
                     </View>
                 </View>
@@ -129,5 +189,24 @@ const styles = StyleSheet.create({
     buttonText: {
         color: '#fff',
         fontFamily: fontSemiBold
+    },
+    textP1: {
+        color: '#000000',
+        fontFamily: fontBold,
+        fontSize: wp('3.5%'),
+        alignSelf: 'center'
+    },
+    containerD: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        margin: wp('4%')
+    },
+    containerDa: {
+        width: wp('8%'),
+        height: wp('8%'),
+        borderRadius: wp('4%'),
+        borderWidth: wp('0.2%'),
+        marginLeft: wp('2%'),
+        marginRight: wp('2%'),
     },
 })

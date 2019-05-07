@@ -22,7 +22,7 @@ export default class termC extends Component {
                 <View style={{ backgroundColor: '#fff', width: '100%', height: '100%' }}>
                     <StatusBar backgroundColor="#282828" barStyle="light-content" />
                     <View style={styles.container}>
-                        <TouchableOpacity style={{ alignSelf: 'center', marginLeft: wp('3%'), }} onPress={() => navigate('home')}><Linericon name="left-arrow-1" size={wp('5%')} color='#000000' /></TouchableOpacity>
+                        <TouchableOpacity style={{ alignSelf: 'center', marginLeft: wp('3%'), }} onPress={() => navigate('home')}><Linericon name="left-arrow-1" size={wp('7.5%')} color='#000000' /></TouchableOpacity>
                         <View style={{ flex: 6, justifyContent: 'center' }}><Text style={[styles.headerText, { alignSelf: 'center', fontSize: wp('5'),marginRight:wp('3%'),fontFamily: fontMed }]}>Terms & Conditions</Text></View>
                     </View>
                     <ScrollView >

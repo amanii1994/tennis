@@ -25,6 +25,8 @@ import Birthday from './src/birthday';
 import BirthdayA from './src/birthdayA';
 import BirthdayB from './src/birthdayB';
 import TeamTennis from './src/teamTennis';
+import TeamTennisA from './src/teamtennisA';
+import TeamTennisC from './src/teamtennisC';
 import SummerA from './src/summerA';
 import SummerB from './src/summerB';
 import SummerC from './src/summerC';
@@ -40,7 +42,12 @@ import Termc from './src/term&conditions';
 import Giftcard from './src/giftcard';
 import Filter from './src/filter';
 import HomeCourtD from './src/homeCourtD';
+import Reader from './src/reader';
 import Guestcheckout from './src/guestcheckout';
+import playSong from './src/playSong';
+import playVideo from './src/playVideo';
+import rewardActivity from './src/rewardActivity';
+import dropinRewardA from './src/dropinRewardA';
 //import Check1 from './src/check1';
 const AppStack = createStackNavigator({ 
   stack: { screen: StackNav, navigationOptions: { header: null } },
@@ -61,6 +68,8 @@ const AppStack = createStackNavigator({
   birthdayA: { screen: BirthdayA, navigationOptions: { header: null } },
   birthdayB: { screen: BirthdayB, navigationOptions: { header: null } },
   teamTennis: { screen: TeamTennis, navigationOptions: { header: null } },
+  teamtennisA: { screen: TeamTennisA, navigationOptions: { header: null } },
+  teamtennisC: { screen: TeamTennisC, navigationOptions: { header: null } },
   summerA: { screen: SummerA, navigationOptions: { header: null } },
   summerB: { screen: SummerB, navigationOptions: { header: null } },
   summerC: { screen: SummerC, navigationOptions: { header: null } },
@@ -73,7 +82,12 @@ const AppStack = createStackNavigator({
   termc: {screen:Termc,navigationOptions: { header: null }},
   giftcard: {screen:Giftcard,navigationOptions: { header: null }},
   filter: {screen: Filter,navigationOptions: { header: null }},
-  guestcheckout: {screen: Guestcheckout, navigationOptions: { header : null}}
+  guestcheckout: {screen: Guestcheckout, navigationOptions: { header : null}},
+  reader :{screen : Reader, navigationOptions: {header: null}} ,
+  playSong:{screen : playSong,navigationOptions: {header: null}},
+  playVideo:{screen : playVideo,navigationOptions: {header: null}},
+  rewardActivity:{screen : rewardActivity,navigationOptions: {header: null}},
+  dropinRewardA:{screen : dropinRewardA,navigationOptions: {header: null}}
   //check1: {screen: Check1,navigationOptions: { header: null }}
  },{
   initialRouteName: 'stack'
@@ -101,22 +115,9 @@ export default createAppContainer(createSwitchNavigator(
   }
 ));
 
-const styles = StyleSheet.create({
+// const styles = StyleSheet.create({
  
-});
-// import {
-//   createSwitchNavigator,
-//   createAppContainer,
-// } from 'react-navigation';
-// import HomeScreen from './app/screens/HomeScreen';
-
-// const RootStack = createSwitchNavigator({
-//   Home: { screen: HomeScreen },
-// }, {
-//   initialRouteName: 'Home',
 // });
-
-// const App = createAppContainer(RootStack);
 
 // export default App;
 

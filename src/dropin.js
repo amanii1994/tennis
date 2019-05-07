@@ -42,7 +42,7 @@ export default class dropin extends Component {
                 price: this.state.price,
                 quantity: this.state.quantity,
                 time_detail: this.state.time_detail,
-                total_price: this.state.quantity * this.state.price
+                total_price: this.state.quantity * this.state.price,
             })
         }else{
             Alert.alert('Please select Price and duration!');
@@ -85,7 +85,7 @@ export default class dropin extends Component {
                         <View style={{ width: wp('100%'), height: hp('23 %'), backgroundcolor: '' }}>
                             <Image source={{ uri: imgUrl + this.state.activity.image }} style={{ flex: 1, height: undefined, width: undefined, }} resizeMode="cover" />
                         </View>
-                        <Linericon name="left-arrow-1" size={wp('6%')} color='#000000' style={{ position: 'absolute', top: 0, left: 0, margin: wp('3%') }} onPress={() => navigate('home')} />
+                        <Linericon name="left-arrow-1" size={wp('7.5%')} color='#000000' style={{ position: 'absolute', top: 0, left: 0, margin: wp('3%') }} onPress={() => navigate('home')} />
                     </View>
                     <View style={{ flexDirection: 'row', margin: wp('4%') }}>
                         <Text style={styles.headerText}>{this.state.activity.activity_name}</Text>

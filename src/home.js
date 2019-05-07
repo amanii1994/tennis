@@ -11,6 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import React, { Component } from 'react';
+import OneSignal from 'react-native-onesignal';
 import { StyleSheet, View, ScrollView, TouchableOpacity, Dimensions, TouchableHighlight, Text, TouchableWithoutFeedback, Platform, Keyboard, Image, AsyncStorage } from 'react-native';
 import StatusBar from './statusBar';
 import { Button, Card, ListItem } from 'react-native-elements';
@@ -59,6 +60,35 @@ export default class home extends Component {
             } 
         });
     }
+    componentWillMount() {
+        OneSignal.init('10656e00-5c7b-4408-856e-a700f3f190e9');
+        OneSignal.addEventListener('received', this.onReceived.bind(this));
+        OneSignal.addEventListener('opened', this.onOpened.bind(this));
+        OneSignal.addEventListener('ids', this.onIds.bind(this));
+        OneSignal.configure();
+        OneSignal.enableVibrate(true);
+        OneSignal.enableSound(true);
+        OneSignal.inFocusDisplaying(2);
+    }
+    onReceived(notification) {
+        console.log("Notification received: ", notification);
+    }
+    onOpened(openResult) {
+        //this.props.navigation.navigate('Message');
+        console.log('Message: ', openResult.notification.payload.body);
+        console.log('Data: ', openResult.notification.payload.additionalData);
+        console.log('isActive: ', openResult.notification.isAppInFocus);
+        console.log('openResult: ', openResult);
+    }
+    onIds(device) {
+        console.log('Device info: ', device);
+        AsyncStorage.getItem("authData").then((info) => {
+            if (info) {
+                let dt = JSON.parse(info);
+                let resData = Restapi.post(Constants.API_URL + 'object=user&action=setPlayerId',{'user_id':dt.id,'player_id' : device.userId});
+            }
+        }).done();
+    }
     renderCards() {
         let cards = [];
         if (this.state.activities) {
@@ -100,16 +130,11 @@ export default class home extends Component {
     }
     componentWillUnmount() {
         this._isMounted = false;
+        OneSignal.removeEventListener('received', this.onReceived);
+        OneSignal.removeEventListener('opened', this.onOpened);
+        OneSignal.removeEventListener('ids', this.onIds);
     }
-    goToNext(){
-        AsyncStorage.getItem("userType").then((info) => {
-            if (info) {
-                if(info != 'guest'){
-                    this.props.navigation.toggleDrawer();
-                }
-            } 
-        });
-    }
+    
     render() {
         
         const { navigate } = this.props.navigation;
@@ -117,7 +142,7 @@ export default class home extends Component {
             <View style={{ backgroundColor: '#fff', width: '100%', height: '100%', paddingBottom: hp('3%') }} >
                 <StatusBar backgroundColor="#282828" barStyle="light-content" />
                 <View style={[styles.container, { marginBottom: wp('3%') }]}>
-                    <Linericon name="Group-102" size={wp('6%')} color="black" style={{ flex: 1, justifyContent: 'flex-start', alignSelf: 'center', marginLeft: wp('3%'), }} onPress={() => this.goToNext()} />
+                    <Linericon name="Group-102" size={wp('7.5%')} color="black" style={{ flex: 1, justifyContent: 'flex-start', alignSelf: 'center', marginLeft: wp('3%'), }} onPress={() => this.props.navigation.toggleDrawer()} />
                     <View style={{ flex: 6, justifyContent: 'center' }}><Text style={styles.headerText}></Text></View>
                 </View>
                 <View style={{ flexDirection: 'row', justifyContent: 'center', height: hp('10%') }}>

@@ -81,7 +81,7 @@ export default class signupa extends Component {
         var error;
         if (text) {
             let reg = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i;
-            if (reg.test(text) === false) {
+            if (reg.test(text.trim()) === false) {
                 error = 2;
                 this.setState({ emailError: 'please enter correct email!!' });
             } else {
@@ -110,20 +110,20 @@ export default class signupa extends Component {
                     dt = JSON.parse(info);
                     dt.firstName = this.state.fname;
                     dt.lastName = this.state.lname;
-                    dt.email = this.state.email;
+                    dt.email = this.state.email.trim();
                     dt.zipCode = this.state.zipCode;
                     AsyncStorage.setItem("userdata", JSON.stringify(dt));
                 } else {
                     let userData = {
                         'firstName': this.state.fname,
                         'lastName': this.state.lname,
-                        'email': this.state.email,
+                        'email': this.state.email.trim(),
                         'zipCode': this.state.zipCode
                     };
                     AsyncStorage.setItem("userdata", JSON.stringify(userData));
                 }
             });
-            let res = restapi.post(apiUrl+'checkEmail', { email: this.state.email});
+            let res = restapi.post(apiUrl+'checkEmail', { email: this.state.email.trim()});
             res.then(res => {
                     if (res.status == 'success') {
                         this.props.navigation.navigate('signupb');

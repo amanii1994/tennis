@@ -31,9 +31,9 @@ export default class Music extends Component {
                         </Text>
                     </View>
                     <View style={styles.container}>
-                        <View style={{ width: wp('75%'), height: wp('32%') }}>
+                        <TouchableOpacity style={{ width: wp('75%'), height: wp('32%') }} onPress={() => navigate('playSong')}>
                             <Image source={require('./img/music2.png')} style={{ flex: 1, height: undefined, width: undefined, }} resizeMode="contain" />
-                        </View>
+                        </TouchableOpacity>
                     </View>
                     <View style={{ width: wp('82%'), marginBottom: wp('10%'), alignSelf: 'center' }}>
                         <View style={{ flexDirection: 'column' }}>

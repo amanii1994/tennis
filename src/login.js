@@ -8,6 +8,12 @@ import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-goog
 import { User } from 'react-native-google-signin';
 import icoMoonConfig from '../selection.json';
 import config from './config';
+import {
+    LoginManager,
+    AccessToken,
+    GraphRequest,
+    GraphRequestManager
+} from 'react-native-fbsdk';
 const Linericon = createIconSetFromIcoMoon(icoMoonConfig, 'icomoon', 'icomoon.ttf');
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 const fontReg = (Platform.OS === 'ios') ? 'Montserrat-Regular' : 'Montserrat-Regular';
@@ -30,7 +36,7 @@ export default class login extends Component {
             signedIn: false, name: "", photoUrl: ""
         }
     }
-    guestLogin(){
+    guestLogin() {
         AsyncStorage.setItem("userToken", "authData");
         AsyncStorage.setItem("userType", "guest");
         let resData = restapi.get(Constants.API_URL + 'object=app&action=getStaticData');
@@ -134,7 +140,7 @@ export default class login extends Component {
         const text = `${error.toString()} ${error.code ? error.code : ''}`;
         return <Text>{text}</Text>;
     }
-    _saveUser(userData){
+    _saveUser(userData) {
         AsyncStorage.setItem("userToken", "authData");
         AsyncStorage.setItem("userType", "user");
         AsyncStorage.setItem("authData", JSON.stringify(userData));
@@ -145,6 +151,86 @@ export default class login extends Component {
             this.props.navigation.navigate('App');
         })
     }
+    async facebookLogin() {
+        // native_only config will fail in the case that the user has
+        // not installed in his device the Facebook app. In this case we
+        // need to go for webview.
+        let result;
+        try {
+            this.setState({ loading: true });
+            result = await LoginManager.logInWithReadPermissions(['public_profile', 'email']);
+        } catch (error) {
+            this.setState({ loading: false });
+            Alert.alert('error');
+        }
+        if (result.isCancelled) {
+            this.setState({
+                loading: false,
+            });
+            Alert.alert('Canecelled');
+        } else {
+            this.setState({ loading: false });
+            // Create a graph request asking for user information
+            this.FBGraphRequest('id, email, picture.type(large),name,first_name,last_name', this.FBLoginCallback);
+        }
+    }
+    async FBGraphRequest(fields, callback) {
+        const accessData = await AccessToken.getCurrentAccessToken();
+        // Create a graph request asking for user information
+        const infoRequest = new GraphRequest('/me', {
+            accessToken: accessData.accessToken,
+            parameters: {
+                fields: {
+                    string: fields
+                }
+            }
+        }, callback.bind(this));
+        // Execute the graph request created above
+        new GraphRequestManager().addRequest(infoRequest).start();
+    }
+    async FBLoginCallback(error, result) {
+        if (error) {
+            this.setState({
+                loading: false,
+               // notificationMessage: I18n.t(welcome.FACEBOOK_GRAPH_REQUEST_ERROR)
+            });
+        } else {
+            // Retrieve and save user details in state. In our case with 
+            // Redux and custom action saveUser
+            console.log(result);
+            let user = {
+                id: result.id,
+                email: result.email,
+                image: result.picture.data.url,
+                name: result.name,
+                first_name : result.first_name,
+                last_name: result.last_name,
+                user_type:'facebook'
+            };
+            console.log(user)
+            if(user){
+                let res = restapi.post(apiUrl + 'socialLoginFb', user);
+                res.then(res => {
+                    if (res.status == 'success') {
+                        if (res.data.mobile) {
+                            this._saveUser(res.data);
+                        } else {
+                            this.props.navigation.navigate('signupfb', { uData: res.data });
+                        }
+                    } else {
+                        Alert.alert(res.msg);
+                    }
+                }).then(this.setState({ loading: false }))
+                    .catch(err => {
+                        if (err == 'TypeError: Network request failed') {
+                            Alert.alert('Something went wrong', 'Kindly check if the device is connected to stable cellular data plan or WiFi.');
+                        }
+                });
+            }else{
+                Alert.alert('Invalid user !!');
+            }
+        }
+    }
     _signIn = async () => {
         try {
             await GoogleSignin.hasPlayServices();
@@ -152,25 +238,25 @@ export default class login extends Component {
             console.log(userInfo)
             userInfo.user.user_type = 'google';
             this.setState({ userInfo, error: null });
-            if(userInfo){
-                let res = restapi.post(apiUrl + 'socialLogin', userInfo.user);
+            if (userInfo) {
+                let res = restapi.post(apiUrl + 'socialLoginGoogle', userInfo.user);
                 res.then(res => {
                     if (res.status == 'success') {
-                        if(res.data.mobile){
+                        if (res.data.mobile) {
                             this._saveUser(res.data);
-                        }else{
-                            this.props.navigation.navigate('signupfb',{uData: res.data});
-                        } 
+                        } else {
+                            this.props.navigation.navigate('signupfb', { uData: res.data });
+                        }
                     } else {
                         Alert.alert(res.msg);
                     }
                 }).then(this.setState({ loading: false }))
-                .catch(err => {
+                    .catch(err => {
                         if (err == 'TypeError: Network request failed') {
                             Alert.alert('Something went wrong', 'Kindly check if the device is connected to stable cellular data plan or WiFi.');
                         }
-                });
-            }else{
+                    });
+            } else {
                 Alert.alert('Invalid User!');
             }
         } catch (error) {
@@ -191,7 +277,7 @@ export default class login extends Component {
         }
     };
 
-   
+
 
     _showSignin() {
         if (this.state.show) {
@@ -206,12 +292,12 @@ export default class login extends Component {
             return null;
         }
     }
-   
+
     validateEmail = (text) => {
         var error;
         if (text) {
             let reg = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i;
-            if (reg.test(text) == false) {
+            if (reg.test(text.trim()) == false) {
                 error = 2;
                 this.setState({ emailError: 'please enter correct email!!' });
             } else {
@@ -244,7 +330,7 @@ export default class login extends Component {
             this.setState({ loading: false });
             return false;
         } else {
-            let res = restapi.post(apiUrl + 'login', { email: this.state.email, password: this.state.password });
+            let res = restapi.post(apiUrl + 'login', { email: this.state.email.trim(), password: this.state.password });
             res.then(res => {
                 if (res.status == 'success') {
                     this._saveUser(res.data);
@@ -326,7 +412,7 @@ export default class login extends Component {
                                     </View>
                                 </View>
                             </TouchableOpacity>
-                            <TouchableOpacity style={[styles.touchStyle, { marginTop: hp('1.5%') }]}>
+                            <TouchableOpacity style={[styles.touchStyle, { marginTop: hp('1.5%') }]} onPress={() => this.facebookLogin()}>
                                 <View style={{ flexDirection: 'row', }}>
                                     <View style={{ alignSelf: 'center' }}>
                                         <Linericon name='Group-197' size={wp('8%')} color='black' />
@@ -336,6 +422,7 @@ export default class login extends Component {
                                     </View>
                                 </View>
                             </TouchableOpacity>
+
                             <TouchableOpacity style={[styles.touchStyle, { marginTop: wp('3%') }]} onPress={this._signIn}>
                                 <View style={{ flexDirection: 'row', }}>
                                     <View style={{ alignSelf: 'center' }}>

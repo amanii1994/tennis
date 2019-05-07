@@ -49,13 +49,13 @@ export default class birthdayA extends Component {
                 zip: this.state.userData.pin_code,
                 budget: this.state.budget,
                 name:this.state.userData.user_name,
-                email:this.state.userData.email,
+                email:this.state.userData.email.trim(),
                 app_date: apdate});
                 res.then(res => {
                     if (res.status == 'success') {
                         Alert.alert(res.msg);
-                        AsyncStorage.clear();
-                        this.props.navigation.navigate('Auth');
+                       // AsyncStorage.clear();
+                        this.props.navigation.navigate('home');
                     } else {
                         Alert.alert(res.msg);
                     }
@@ -131,7 +131,7 @@ export default class birthdayA extends Component {
         var error;
         if (text) {
             let reg = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i;
-            if (reg.test(text) === false) {
+            if (reg.test(text.trim()) === false) {
                 error = 2;
                 this.setState({ emailError: 'please enter correct email!!' });
             } else {
@@ -193,19 +193,19 @@ export default class birthdayA extends Component {
                 <View style={{ backgroundColor: '#fff', width: '100%', height: '100%', flex: 1 }}>
                     <StatusBar backgroundColor="#282828" barStyle="light-content" />
                     <View style={styles.container}>
-                        <TouchableOpacity style={{ alignSelf: 'center', marginLeft: wp('3%'), }} onPress={() => navigate('birthday')}><Linericon name="left-arrow-1" size={wp('5%')} color='#000000' /></TouchableOpacity>
+                        <TouchableOpacity style={{ alignSelf: 'center', marginLeft: wp('3%'), }} onPress={() => navigate('birthday')}><Linericon name="left-arrow-1" size={wp('7.5%')} color='#000000' /></TouchableOpacity>
                         <View style={{ flex: 6, justifyContent: 'center' }}><Text style={[styles.headerText, { fontSize: wp('5'),fontFamily:fontMed }]}>Tiny Request</Text></View>
                     </View>
                     <ScrollView>
                     <KeyboardAvoidingView style={{ flexDirection: 'column', alignSelf: 'center', justifyContent: 'space-around', marginTop:wp('6%') }}>
                         <View style={[styles.containerC]}>
-                        <View style={{ width: wp('30%'), justifyContent: 'space-around' }}>
+                        {/* <View style={{ width: wp('30%'), justifyContent: 'space-around' }}>
                                 <Text style={[styles.textcontainerC, { marginLeft: wp('2%') }]}> Name  </Text>
-                            </View>
+                            </View> */}
                             <View style={{ width: wp('70%'), justifyContent: 'space-around' }}>
                                 <TextInput 
                                     editable={this.state.show?true:false}
-                                    style={[styles.textcontainerC, { alignItems: 'flex-start' }]} 
+                                    style={[styles.textcontainerC, { alignItems: 'flex-start' ,marginLeft: wp('5%')}]} 
                                     placeholder='Enter Name' 
                                     autoCapitalize='none'
                                     onChangeText={ text => this.setState(
@@ -223,13 +223,13 @@ export default class birthdayA extends Component {
                     </KeyboardAvoidingView>
                     <KeyboardAvoidingView style={{ flexDirection: 'column', alignSelf: 'center', justifyContent: 'space-around', marginTop:wp('3%') }}>
                         <View style={[styles.containerC, {  }]}>
-                        <View style={{ width: wp('30%'), justifyContent: 'space-around' }}>
+                        {/* <View style={{ width: wp('30%'), justifyContent: 'space-around' }}>
                                 <Text style={[styles.textcontainerC, { marginLeft: wp('2%') }]}> Child Name  </Text>
-                            </View>
+                            </View> */}
                             <View style={{ width: wp('70%'), justifyContent: 'space-around' }}>
                             <TextInput 
-                                style={[styles.textcontainerC, { alignItems: 'flex-start' }]} 
-                                placeholder='Enter Name'
+                                style={[styles.textcontainerC, { alignItems: 'flex-start',marginLeft: wp('5%') }]} 
+                                placeholder='Enter Child Name'
                                 autoCapitalize='none'
                                 onChangeText={text => this.setState({ cname: text })}
                                 value={this.state.cname}
@@ -240,15 +240,16 @@ export default class birthdayA extends Component {
                     </KeyboardAvoidingView>
                     <KeyboardAvoidingView style={{ flexDirection: 'column', alignSelf: 'center', justifyContent: 'space-around', marginTop:wp('3%') }}>
                         <View style={[styles.containerC, {  }]}>
-                            <View style={{ width: wp('30%'), justifyContent: 'space-around' }}>
+                            {/* <View style={{ width: wp('30%'), justifyContent: 'space-around' }}>
                                 <Text style={[styles.textcontainerC, { marginLeft: wp('2%') }]}> Phone  </Text>
-                            </View>
+                            </View> */}
                             <View style={{ width: wp('70%'), justifyContent: 'space-around' }}>
                             <TextInput 
                                 editable={this.state.show?true:false}
-                                style={[styles.textcontainerC, { alignItems: 'flex-start' }]} 
+                                style={[styles.textcontainerC, { alignItems: 'flex-start',marginLeft: wp('5%') }]} 
                                 placeholder='Enter Phone' 
                                 autoCapitalize='none'
+                                keyboardType={'numeric'}
                                 value={this.state.userData.mobile}
                                 onChangeText={ text => this.setState(
                                     prevState => ({
@@ -264,13 +265,13 @@ export default class birthdayA extends Component {
                     </KeyboardAvoidingView>
                     <KeyboardAvoidingView style={{ flexDirection: 'column', alignSelf: 'center', marginTop:wp('3%') }}>
                         <View style={[styles.containerC, { }]}>
-                            <View style={{ width: wp('30%'), justifyContent: 'space-around' }}>
+                            {/* <View style={{ width: wp('30%'), justifyContent: 'space-around' }}>
                                 <Text style={[styles.textcontainerC, { marginLeft: wp('2%') }]}> Email  </Text>
-                            </View>
-                            <View style={{ width: wp('70%'), justifyContent: 'space-around' }}>
+                            </View> */}
+                            <View style={{ width: wp('95%'), justifyContent: 'space-around' }}>
                             <TextInput 
                                  editable={this.state.show?true:false}
-                                style={[styles.textcontainerC, { alignItems: 'flex-start' }]} 
+                                style={[styles.textcontainerC, { alignItems: 'flex-start',marginLeft: wp('5%') }]} 
                                 placeholder='Enter Email' 
                                 autoCapitalize='none'
                                 value={this.state.userData.email}
@@ -288,12 +289,12 @@ export default class birthdayA extends Component {
                     </KeyboardAvoidingView>
                     <KeyboardAvoidingView style={{ flexDirection: 'column', alignSelf: 'center', marginTop:wp('3%') }}>
                         <View style={[styles.containerC, {  }]}>
-                            <View style={{ width: wp('30%'), justifyContent: 'space-around' }}>
+                            {/* <View style={{ width: wp('30%'), justifyContent: 'space-around' }}>
                                 <Text style={[styles.textcontainerC, { marginLeft: wp('2%') }]}> Zip  </Text>
-                            </View>
-                            <View style={{ width: wp('70%'), justifyContent: 'space-around' }}>
+                            </View> */}
+                            <View style={{ width: wp('95%'), justifyContent: 'space-around' }}>
                             <TextInput 
-                                style={[styles.textcontainerC, { alignItems: 'flex-start' }]} 
+                                style={[styles.textcontainerC, { alignItems: 'flex-start',marginLeft: wp('5%') }]} 
                                 placeholder='Enter Zip Code' 
                                 autoCapitalize='none'
                                 onChangeText={ text => this.setState(
@@ -311,12 +312,12 @@ export default class birthdayA extends Component {
                     </KeyboardAvoidingView>
                     <KeyboardAvoidingView style={{ flexDirection: 'column', alignSelf: 'center', marginTop:wp('3%') }}>
                         <View style={[styles.containerC, {  }]}>
-                            <View style={{ width: wp('30%'), justifyContent: 'space-around' }}>
+                            {/* <View style={{ width: wp('30%'), justifyContent: 'space-around' }}>
                                 <Text style={[styles.textcontainerC, { marginLeft: wp('2%') }]}> Budget  </Text>
-                            </View>
-                            <View style={{ width: wp('70%'), justifyContent: 'space-around' }}>
+                            </View> */}
+                            <View style={{ width: wp('95%'), justifyContent: 'space-around' }}>
                             <TextInput 
-                                style={[styles.textcontainerC, { alignItems: 'flex-start' }]} 
+                                style={[styles.textcontainerC, { alignItems: 'flex-start',marginLeft: wp('5%') }]} 
                                 placeholder='Enter Budget' 
                                 keyboardType={'numeric'}
                                 autoCapitalize='none'
@@ -373,7 +374,7 @@ const styles = StyleSheet.create({
     containerC:
     {
         width: wp('95%'),
-        height: hp('6%'),
+        height: hp('6.6%'),
         borderWidth: wp('0.3%'),
         flexDirection: 'row',
         borderColor: '#000000',

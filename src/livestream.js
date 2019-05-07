@@ -20,7 +20,7 @@ export default class livestream extends Component {
                     <View style={{ width: wp('100%'), height: hp('23 %'), backgroundcolor: '' }}>
                         <Image source={require('./img/live2.png')} style={{ flex: 1, height: undefined, width: undefined, }} resizeMode="cover" />
                     </View>
-                    <Linericon name="left-arrow-1" size={wp('6%')} color='#fff' style={{ position: 'absolute', top: 0, left: 0, margin: wp('3%') }} onPress={() => navigate('home')} />
+                    <Linericon name="left-arrow-1" size={wp('7.5%')} color='#fff' style={{ position: 'absolute', top: 0, left: 0, margin: wp('3%') }} onPress={() => navigate('home')} />
                 </View>
                 <ScrollView >
 
@@ -42,6 +42,7 @@ export default class livestream extends Component {
                             buttonStyle={[styles.buttonstyle, {}]}
                             title='LIVE STREAM'
                             titleStyle={styles.buttonText}
+                            onPress={() => navigate('playVideo')}
                            
                         />
                     </View>

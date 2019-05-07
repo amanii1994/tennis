@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Platform, Image, Alert, TouchableOpacity, AsyncStorage, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, StyleSheet, Platform, Image, Alert, TextInput,TouchableOpacity, AsyncStorage, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import StatusBar from './statusBar';
 import { createIconSetFromIcoMoon } from 'react-native-vector-icons';
@@ -70,11 +70,12 @@ export default class summerB extends Component {
                     'quantity': quantity,
                     'product_id': product_id,
                     'price': price,
-                    'app_date': moment(this.state.selectedDate).format('YYYY-MM-DD'),
+                    'app_date': '0000-00-00',
                     'location_id': this.state.selectedLoc,
                     'loc_name': this.state.selectedLabel,
                     'activity_name': activity_name,
-                    'total_price': this.props.navigation.getParam('total_price')
+                    'total_price': this.props.navigation.getParam('total_price'),
+                    'zip_code':this.state.userData.pin_code,
                 };
             }else{
                 this.itemdata = {
@@ -83,11 +84,12 @@ export default class summerB extends Component {
                     'quantity': quantity,
                     'product_id': product_id,
                     'price': price,
-                    'app_date': moment(this.state.selectedDate).format('YYYY-MM-DD'),
+                    'app_date': '0000-00-00',
                     'location_id': this.state.selectedLoc,
                     'loc_name': this.state.selectedLabel,
                     'activity_name': activity_name,
-                    'total_price': this.props.navigation.getParam('total_price')
+                    'total_price': this.props.navigation.getParam('total_price'),
+                    'zip_code':this.state.userData.pin_code,
                 };
             }          
             this.props.navigation.navigate('summerC', { itemData: this.itemdata });
@@ -98,42 +100,53 @@ export default class summerB extends Component {
             return (
                 <View>
                         <View style={{ flexDirection: 'row', alignSelf: 'center', justifyContent: 'space-around', marginTop: wp('6%') }}>
-                            <View style={[styles.containerC, { padding: wp('2%') }]}>
-                                <View style={{ width: wp('20%'), justifyContent: 'space-around' }}>
+                            <View style={[styles.containerC, {}]}>
+                                {/* <View style={{ width: wp('20%'), justifyContent: 'space-around' }}>
                                     <Text style={[styles.textcontainerC, { marginLeft: wp('2%') }]}> Name  </Text>
-                                </View>
-                                <View style={{ width: wp('80%'), justifyContent: 'space-around' }}>
-                                    <Text style={[styles.textcontainerC, { alignItems: 'flex-start' }]}> {this.state.userData.user_name}</Text>
+                                </View> */}
+                                <View style={{ width: wp('95%'), justifyContent: 'space-around' }}>
+                                    <Text style={[styles.textcontainerC, { alignItems: 'flex-start',marginLeft: wp('5%') }]}> {this.state.userData.user_name}</Text>
                                 </View>
                             </View>
                         </View>
                         <View style={{ flexDirection: 'row', alignSelf: 'center', justifyContent: 'space-around', marginTop: wp('3%') }}>
-                            <View style={[styles.containerC, { padding: wp('2%') }]}>
-                                <View style={{ width: wp('20%'), justifyContent: 'space-around' }}>
+                            <View style={[styles.containerC, {}]}>
+                                {/* <View style={{ width: wp('20%'), justifyContent: 'space-around' }}>
                                     <Text style={[styles.textcontainerC, { marginLeft: wp('2%') }]}> Phone  </Text>
-                                </View>
-                                <View style={{ width: wp('80%'), justifyContent: 'space-around' }}>
-                                    <Text style={[styles.textcontainerC, { alignItems: 'flex-start' }]}> {this.state.userData.mobile}</Text>
+                                </View> */}
+                                <View style={{ width: wp('95%'), justifyContent: 'space-around' }}>
+                                    <Text style={[styles.textcontainerC, { alignItems: 'flex-start',marginLeft: wp('5%') }]}> {this.state.userData.mobile}</Text>
                                 </View>
                             </View>
                         </View>
                         <View style={{ flexDirection: 'row', alignSelf: 'center', marginTop: wp('3%') }}>
-                            <View style={[styles.containerC, { padding: wp('1%') }]}>
-                                <View style={{ width: wp('20%'), justifyContent: 'space-around' }}>
+                            <View style={[styles.containerC, { }]}>
+                                {/* <View style={{ width: wp('20%'), justifyContent: 'space-around' }}>
                                     <Text style={[styles.textcontainerC, { marginLeft: wp('2%') }]}> Email  </Text>
-                                </View>
-                                <View style={{ width: wp('80%'), justifyContent: 'space-around' }}>
-                                    <Text style={[styles.textcontainerC, { alignItems: 'flex-start' }]}> {this.state.userData.email}</Text>
+                                </View> */}
+                                <View style={{ width: wp('95%'), justifyContent: 'space-around' }}>
+                                    <Text style={[styles.textcontainerC, { alignItems: 'flex-start',marginLeft: wp('5%') }]}> {this.state.userData.email}</Text>
                                 </View>
                             </View>
                         </View>
                         <View style={{ flexDirection: 'row', alignSelf: 'center', marginTop: wp('3%') }}>
-                            <View style={[styles.containerC, { padding: wp('1%') }]}>
-                                <View style={{ width: wp('20%'), justifyContent: 'space-around' }}>
+                            <View style={[styles.containerC, { }]}>
+                                {/* <View style={{ width: wp('20%'), justifyContent: 'space-around' }}>
                                     <Text style={[styles.textcontainerC, { marginLeft: wp('2%') }]}> Zip  </Text>
-                                </View>
-                                <View style={{ width: wp('80%'), justifyContent: 'space-around' }}>
-                                    <Text style={[styles.textcontainerC, { alignItems: 'flex-start' }]}> {this.state.userData.pin_code != 'undefined' ? this.state.userData.pin_code : ''}</Text>
+                                </View> */}
+                                <View style={{ width: wp('95%'), justifyContent: 'space-around' }}>
+                                    <TextInput 
+                                        style={[styles.textcontainerC, { alignItems: 'flex-start', marginLeft: wp('5%') }]} 
+                                        placeholder='Enter zipcode' 
+                                        value={this.state.userData.pin_code != 'undefined' ? this.state.userData.pin_code : ''}
+                                        onChangeText={ text => this.setState(
+                                            prevState => ({
+                                                userData: {...prevState.userData,
+                                                    pin_code:text
+                                                }
+                                            }))
+                                        }
+                                    />
                                 </View>
                             </View>
                         </View>
@@ -143,13 +156,6 @@ export default class summerB extends Component {
             return null;
         }
     }
-    _updateWeek(val) {
-        if (this.state.selectedDate > val) {
-            this.setState({ selectedDate: moment(this.state.selectedDate).add(-7, 'days') });
-        } else {
-            this.setState({ selectedDate: moment(this.state.selectedDate).add(7, 'days') });
-        }
-    }
     render() {
         const { navigate } = this.props.navigation;
         return (
@@ -157,27 +163,8 @@ export default class summerB extends Component {
                 <View style={{ backgroundColor: '#fff', width: '100%', height: '100%', flex: 1 }}>
                     <StatusBar backgroundColor="#282828" barStyle="light-content" />
                     <View style={styles.container}>
-                        <TouchableOpacity style={{ alignSelf: 'center', marginLeft: wp('3%'), }} onPress={() => navigate('summerA')}><Linericon name="left-arrow-1" size={wp('5%')} color='#000000' /></TouchableOpacity>
+                        <TouchableOpacity style={{ alignSelf: 'center', marginLeft: wp('3%'), }} onPress={() => navigate('summerA')}><Linericon name="left-arrow-1" size={wp('7.5%')} color='#000000' /></TouchableOpacity>
                         <View style={{ flex: 6, justifyContent: 'center' }}><Text style={[styles.headerText, { fontSize: wp('5'), fontFamily: fontMed }]}>Save a SPOT!</Text></View>
-                    </View>
-                    <View style={{ paddingTop: 20, backgroundColor: '#fff', }}>
-                        <CalendarStrip
-                            calendarAnimation={{ type: 'sequence', duration: 30 }}
-                            daySelectionAnimation={{ type: 'border', duration: 200, borderWidth: 1, borderHighlightColor: '#CBCBCB' }}
-                            style={{ height: 100, backgroundColor: '#F7F7F7' }}
-                            calendarHeaderStyle={{ color: 'black' }}
-                            dateNumberStyle={{ color: 'black' }}
-                            dateNameStyle={{ color: 'black' }}
-                            highlightDateNumberStyle={{ color: 'green' }}
-                            highlightDateNameStyle={{ color: 'green' }}
-                            disabledDateNameStyle={{ color: 'grey' }}
-                            disabledDateNumberStyle={{ color: 'grey' }}
-                            onWeekChanged={(value) => this._updateWeek(value)}
-                            updateWeek={false}
-                            selectedDate={this.state.selectedDate}
-                            iconContainer={{ flex: 0.1 }}
-                        />
-
                     </View>
                     <View style={{ width: wp('90%'), marginLeft: wp('1%'), alignSelf: 'center' }}>
                         <Dropdown

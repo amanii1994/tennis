@@ -55,6 +55,11 @@ export default restapi = {
         let res = await this.post(url, data);
         return res; 
     },
+    async saveAppointReward(data) {
+        let url = Constants.API_URL + 'object=app&action=createAppointReward';
+        let res = await this.post(url, data);
+        return res; 
+    },
     async saveAppointGuest(data) {
         console.log(data);
         let url = Constants.API_URL + 'object=app&action=createAppointGuest';

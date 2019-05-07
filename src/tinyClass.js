@@ -13,23 +13,21 @@ const fontSemiBold = (Platform.OS === 'ios') ? 'Montserrat-SemiBold' : 'Montserr
 const fontBold = (Platform.OS === 'ios') ? 'Montserrat-Bold' : 'Montserrat-Bold';
 import Constants from './constants';
 export default class tinyClass extends Component {
+    _isMounted = false;
     constructor(props) {
         super(props);
         this.state={
             userData: {},
-            appointments:[]
+            appointments:[],
+            points:'000',
         };
-        console.log('testt');
     }
     componentWillUnmount() {
-        console.log('hjhsjhddd');
         this._isMounted = false;
     }
     componentDidMount() {
         this._isMounted = true;
-        console.log('fhgfhfgddd');
         if (this._isMounted) {
-            console.log('fhgfhfg');
             AsyncStorage.getItem("authData").then((info) => {
                 if (info) {
                     let dt = JSON.parse(info);
@@ -38,7 +36,7 @@ export default class tinyClass extends Component {
                     res.then(res => {
                         if (res.status == 'success') {
                             console.log(res.status);
-                            this.setState({appointments:res.result});
+                            this.setState({appointments:res.result,points:res.result[0].points});
                             console.log(this.state.appointments);
                         } 
                     }).then(this.setState({ loading: false }))
@@ -54,7 +52,6 @@ export default class tinyClass extends Component {
         }
     }
     componentWillReceiveProps(){
-        console.log('hghdgs');
         AsyncStorage.getItem("authData").then((info) => {
             if (info) {
                 let dt = JSON.parse(info);
@@ -63,7 +60,7 @@ export default class tinyClass extends Component {
                 res.then(res => {
                     if (res.status == 'success') {
                         console.log(res.status);
-                        this.setState({appointments:res.result});
+                        this.setState({appointments:res.result,points:res.result[0].points});
                         console.log(this.state.appointments);
                     } 
                 }).then(this.setState({ loading: false }))
@@ -82,7 +79,7 @@ export default class tinyClass extends Component {
             <View style={{ backgroundColor: '#fff', width: '100%', height: '100%' }}>
                 <StatusBar backgroundColor="#282828" barStyle="light-content" />
                 <View style={styles.container}>
-                    <TouchableOpacity style={{ alignSelf: 'center', marginLeft: wp('3%'), }} onPress={() => this.props.navigation.goBack(null)}><Linericon name="left-arrow-1" size={wp('5%')} color='#000000' /></TouchableOpacity>
+                    <TouchableOpacity style={{ alignSelf: 'center', marginLeft: wp('3%'), }} onPress={() => this.props.navigation.goBack(null)}><Linericon name="left-arrow-1" size={wp('7.5%')} color='#000000' /></TouchableOpacity>
                 </View>
                 <ScrollView>
                     <View>
@@ -132,7 +129,7 @@ export default class tinyClass extends Component {
                                     </View>
                                     <View style={{ flexDirection: 'row' }}>
                                         <Text style={[styles.containerAT, { color: '#606060' }]}>Points: </Text>
-                                        <Text style={[styles.containerAT, { color: '#000000' }]}> 000</Text>
+                                        <Text style={[styles.containerAT, { color: '#000000' }]}>{this.state.points}</Text>
                                     </View>
                                 </View>
                             </View>
@@ -149,7 +146,7 @@ export default class tinyClass extends Component {
                                 </View>
                                 <View style={styles.containerBb}>
                                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginRight: wp('5%') }}>
-                                        <Text style={[styles.containerAT, { color: '#606060' }]}>{data.app_date}</Text>
+                                        <Text style={[styles.containerAT, { color: '#606060' }]}>{data.app_date == '0000-00-00'?data.created:data.app_date}</Text>
                                         <Text style={[styles.containerAT, { color: '#000000' }]}>{data.time_detail}</Text>
                                     </View>
                                 </View>
